@@ -12,9 +12,12 @@ body{background:#f4f5f5;color:var(--ink);font:15px/1.5 Inter,Arial,sans-serif;ma
 .window{margin:16px 0;border:1px solid var(--line);border-radius:5px;padding:10px 12px}.window legend{font-size:13px;font-weight:600}.bounds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.settings{margin:0 0 10px}.settings summary{color:var(--blue);font-weight:600}.settingscroll{overflow:auto;max-height:365px;border:1px solid var(--line);margin-top:8px}.settings table{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}.settings th,.settings td{padding:6px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}.settings tbody th{font-weight:500}.settings thead th{position:sticky;top:0;background:#eff3f7}
 .sessionbar,.noteTools,.historyRow,.noteRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.sessionbar{margin-bottom:18px;align-items:end}.sessionbar label,.noteTools label{display:grid;font-size:12px;color:var(--sub);gap:4px}.sessionbar label{min-width:230px}.sessionbar span,.noteRow,.historyRow small{font-size:13px;color:var(--sub)}.historyRow{padding:12px 0;border-bottom:1px solid var(--line)}.historyRow div{flex:1;min-width:160px}.historyRow b,.historyRow small{display:block;overflow-wrap:anywhere}.axisnames,#notesPanel{margin:12px 0;padding:10px 0;border-top:1px solid var(--line)}.axisnames .bounds,.noteTools{margin-top:10px}.noteTools{align-items:end}.noteRow{justify-content:space-between;padding-top:6px}.noteRow span{overflow-wrap:anywhere}.noteTools label{flex:1;min-width:150px}
 #stage{position:relative;container-type:inline-size}#handles{position:absolute;inset:0;touch-action:none;user-select:none;overflow:hidden}.noteHandle{position:absolute;transform:translate(-50%,-50%);cursor:grab}.textHandle{line-height:1.3;font-size:1.93cqw;color:transparent;border:1px dashed #5273b3;white-space:pre;padding:2px}.textHandle.moving{background:white;color:#151a20}.arrowHandle{width:12px;height:12px;border-radius:50%;border:1px solid #3156a7;background:#fff9}.arrowPreview{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.arrowPreview line{stroke:#3156a7;stroke-width:2;vector-effect:non-scaling-stroke}
+#lcms .card{margin-bottom:14px}#lcms canvas{display:block;width:100%;touch-action:none;cursor:crosshair}#lcms .lcInline,.lcFilters,.lcRun{display:flex;align-items:end;flex-wrap:wrap;gap:10px}.lcFilters>label,.lcInline label{min-width:110px;flex:1}.lcFilters>div{flex-basis:100%}.lcFilters label{font-size:12px}.lcRun{align-items:center;border-top:1px solid var(--line);padding:9px 0}.lcRun input{height:16px;width:16px}.lcRun b{overflow-wrap:anywhere;font-size:13px}.lcRun small{flex:1}.lcSw{width:13px;height:4px;border-radius:2px}.lcRun small,.lcChart small,#lcSummary,.lcHint,#lcms output{font-size:12px;color:var(--sub)}#lcms output{display:block;min-height:24px;margin:5px 0}.lcChart .sectionhead{align-items:baseline;flex-wrap:wrap}.lcChart .lcInline{border-top:1px solid var(--line);padding-top:12px}#lcSummary{margin:8px 0;overflow-wrap:anywhere}#lcError{color:#942b21;white-space:pre-line}#lcStatus:empty,#lcError:empty{display:none}.bar nav{overflow-x:auto;white-space:nowrap;min-width:0}@media(max-width:620px){.bar{gap:14px}.bar nav{gap:14px}.bar nav a{font-size:12px}}
+
+#lcPeaks{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}#lcPeakRows h3{font-size:14px}#lcPeakRows table{border-collapse:collapse;width:100%;max-width:600px;font-size:13px;font-variant-numeric:tabular-nums}#lcPeakRows td,#lcPeakRows th{text-align:left;padding:4px 10px;border-bottom:1px solid var(--line)}
 </style></head>
 <body>
-<header class="bar"><div class="mark" aria-hidden="true">N<span>T</span></div><nav aria-label="Workspace"><a href="#photos">Photos</a><a href="#analysis">EC-Lab analysis</a><a href="#sessions">Saved sessions</a></nav></header>
+<header class="bar"><div class="mark" aria-hidden="true">N<span>T</span></div><nav aria-label="Workspace"><a href="#photos">Photos</a><a href="#analysis">EC-Lab analysis</a><a href="#lcms">LC-MS</a><a href="#sessions">Saved sessions</a></nav></header>
 <main id="photos" class="page">
 <div class="heading"><h1>Photos</h1><button class="primary" id="upload" disabled>＋ Add photos</button></div>
 <div class="strip"><span><b id="count">00</b> <span id="countLabel">photos</span></span><span>Newest first</span></div>
@@ -34,6 +37,18 @@ body{background:#f4f5f5;color:var(--ink);font:15px/1.5 Inter,Arial,sans-serif;ma
 <details id="details"><summary>Python code</summary><pre id="source">Import a file to generate code.</pre></details></section></div>
 <footer>Files are processed in your browser. The plotting engine loads online on first use.</footer></main>
 <main class="page" id="sessions" hidden><div class="heading"><h1>Saved sessions</h1></div><section class="card"><div id="sessionList"></div><p id="historyStatus" role="status"></p></section><footer>Sessions are stored in this browser on this device.</footer></main><input type="file" id="files" accept="image/*" multiple hidden><div id="dropOverlay" class="drop-overlay" hidden>Drop files here</div>
+<main id="lcms" class="page" hidden>
+<div class="heading"><h1>LC-MS analysis</h1><button id="lcImport" class="primary">＋ Import mzML</button></div>
+<input id="lcFiles" type="file" accept=".mzml,.xml" multiple hidden>
+<section class="card lcSource"><h2>Runs</h2><div id="lcRuns"></div><p id="lcEmpty">Drop .mzML or .xml files here.</p><p id="lcStatus" role="status"></p><p id="lcError" role="alert"></p></section>
+<div id="lcControls" hidden><div class="lcFilters card">
+<label>Mass channel<select id="lcChannel"></select></label><label>Chromatogram<select id="lcKind"></select></label>
+<label>Comparison<select id="lcMode"><option>Overlay</option><option>Stacked</option></select></label><label>Intensity<select id="lcScale"><option value="raw">Absolute</option><option value="relative">Relative (% of run maximum)</option></select></label>
+<div id="lcIon" class="lcInline" hidden><label>Target m/z<input type="number" step="any" id="lcTarget" value="167.0147"></label><label>Tolerance (± ppm)<input type="number" step="any" id="lcTol" value="10"></label></div></div>
+<section class="card lcChart"><div class="sectionhead"><h2>Chromatogram</h2><small>Click for one scan · Drag for an elution window</small></div><canvas id="lcTrace" aria-label="Intensity versus retention time"></canvas><output id="lcTraceRead"></output>
+<div class="lcInline"><label>Start (min)<input id="lcStart" type="number" step="any"></label><label>End (min)<input id="lcEnd" type="number" step="any"></label><button id="lcApply">Apply window</button><button id="lcAll">Full run</button></div></section>
+<section class="card lcChart"><div class="sectionhead"><h2>Mass spectrum</h2><small>Drag to zoom · Double-click to reset</small></div><div id="lcSummary"></div><canvas id="lcMass" aria-label="Intensity versus mass-to-charge ratio"></canvas><output id="lcMassRead"></output>
+<div class="lcInline"><label>Minimum m/z<input id="lcLow" type="number" step="any" placeholder="Auto"></label><label>Maximum m/z<input id="lcHigh" type="number" step="any" placeholder="Auto"></label><button id="lcZoom">Set range</button><button id="lcReset">Reset zoom</button><label>Window bin width (Da)<input type="number" id="lcBin" step="any" value="0.01"></label></div><p class="lcHint">Single scans show native m/z values. Across a window, intensities are summed in fixed-width bins and divided by the number of scans. Each bin is plotted at its intensity-weighted m/z.</p><details id="lcPeaks"><summary>Strongest peaks in view</summary><div id="lcPeakRows"></div></details></section></div></main>
 <dialog id="viewer" aria-label="Full photo view"><div class="viewer-head"><span id="viewerIndex"></span><button id="closeViewer" aria-label="Close photo">×</button></div><img id="viewerImage" alt=""><div class="viewer-foot"><button id="previous" aria-label="Previous photo">←</button><div class="viewer-copy"><div id="viewerCaption"></div><div id="viewerDate"></div></div><button id="next" aria-label="Next photo">→</button></div></dialog>
 <script>
 'use strict';
@@ -49,7 +64,7 @@ async function saveCaption(row,field,label){const caption=field.value;label.text
 async function render(){const data=await op('readonly',s=>s.getAll());rows=data.sort((a,b)=>b.time-a.time);urls.forEach(URL.revokeObjectURL);urls=[];$('#feed').replaceChildren();$('#count').textContent=String(rows.length).padStart(2,'0');$('#countLabel').textContent=rows.length===1?'photo':'photos';$('#empty').hidden=!!rows.length;rows.forEach((row,index)=>{const url=URL.createObjectURL(row.blob);urls.push(url);const date=dateOf(row),article=element('article','entry'),rail=element('div','date-rail');rail.append(element('div','month',date?.toLocaleDateString(undefined,{month:'long'})||'Unknown'),element('div','day',date?String(date.getDate()).padStart(2,'0'):'—'),element('div','year',date?String(date.getFullYear()):''));const clock=element('div','clock');clock.append(element('small','','Added'));const time=element('time','',date?.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})||'—');if(date)time.dateTime=date.toISOString();clock.append(time);rail.append(clock);const figure=element('figure','photo'),button=element('button','image-button'),img=element('img');img.src=url;img.alt=row.caption||row.name||'Photo';img.loading=index?'lazy':'eager';img.decoding='async';button.setAttribute('aria-label','View '+(row.name||'photo')+' full size');button.append(img);button.onclick=()=>openViewer(index);img.onerror=()=>{img.alt='This image cannot be displayed. Use the menu to download the original.';};const under=element('figcaption','under'),area=element('div','caption-area'),caption=element('textarea','caption');caption.rows=1;caption.maxLength=3000;caption.placeholder='Add a caption…';caption.value=row.caption||'';caption.setAttribute('aria-label','Caption for '+row.name);const label=element('span','saved');label.setAttribute('role','status');caption.oninput=()=>{fit(caption);img.alt=caption.value||row.name;saveCaption(row,caption,label);};const meta=element('div','filemeta',row.name+' · '+(row.blob.size/1024/1024).toFixed(1)+' MB');area.append(caption,label,meta);const more=element('details','more'),summary=element('summary','','···');summary.setAttribute('aria-label','Options for '+row.name);const menu=element('div','menu'),download=element('a','','Download original');download.href=url;download.download=row.name;const del=element('button','delete','Delete photo');del.onclick=async()=>{if(!confirm('Delete this photo and its caption from this browser?'))return;del.disabled=true;try{await Promise.allSettled([...saves.values()]);await op('readwrite',s=>s.delete(row.id));await render();announce('Photo deleted.');}catch(e){del.disabled=false;announce('Could not delete the photo. Try again.');}};menu.append(download,del);more.append(summary,menu);more.ontoggle=()=>{if(more.open)document.querySelectorAll('.more[open]').forEach(other=>{if(other!==more)other.open=false;});};under.append(area,more);figure.append(button,under);article.append(rail,figure);$('#feed').append(article);fit(caption);});}
 $('#upload').onclick=$('#firstUpload').onclick=()=>$('#files').click();
 async function upload(files){if(!db||busy)return;busy=true;$('#upload').disabled=$('#firstUpload').disabled=true;let added=0;const failed=[];await Promise.allSettled([...saves.values()]);for(const file of files){announce('Adding photos… '+(added+failed.length+1)+' / '+files.length);try{if(!file.type.startsWith('image/')||file.size>25*1024*1024)throw Error('Unsupported file');const url=URL.createObjectURL(file);try{await new Promise((resolve,reject)=>{const img=new Image();img.onload=resolve;img.onerror=reject;img.src=url;});}finally{URL.revokeObjectURL(url);}await op('readwrite',s=>s.put({id:crypto.randomUUID(),time:Date.now(),name:file.name,blob:file,caption:''}));added++;}catch(e){failed.push(file.name);}}try{await Promise.allSettled([...saves.values()]);await render();announce(`${added} photo${added===1?'':'s'} added.`+(failed.length?' Could not add '+failed.join(', ')+'. Use browser-readable images up to 25 MB; storage may also be full.':''));}catch(e){announce('Could not refresh the journal. Reload to see saved photos.');}finally{busy=false;$('#upload').disabled=$('#firstUpload').disabled=false;$('#files').value='';}}
-$('#files').onchange=e=>upload(Array.from(e.target.files));let dragDepth=0;document.addEventListener('dragenter',e=>{if(!Array.from(e.dataTransfer.types).includes('Files'))return;e.preventDefault();dragDepth++;$('#dropOverlay').hidden=false;});document.addEventListener('dragover',e=>{if(Array.from(e.dataTransfer.types).includes('Files'))e.preventDefault();});document.addEventListener('dragleave',e=>{e.preventDefault();if(--dragDepth<=0){dragDepth=0;$('#dropOverlay').hidden=true;}});document.addEventListener('drop',e=>{e.preventDefault();dragDepth=0;$('#dropOverlay').hidden=true;if(!$('#sessions').hidden)return;($('#analysis').hidden?upload:window.importRuns)(Array.from(e.dataTransfer.files));});
+$('#files').onchange=e=>upload(Array.from(e.target.files));let dragDepth=0;document.addEventListener('dragenter',e=>{if(!Array.from(e.dataTransfer.types).includes('Files'))return;e.preventDefault();dragDepth++;$('#dropOverlay').hidden=false;});document.addEventListener('dragover',e=>{if(Array.from(e.dataTransfer.types).includes('Files'))e.preventDefault();});document.addEventListener('dragleave',e=>{e.preventDefault();if(--dragDepth<=0){dragDepth=0;$('#dropOverlay').hidden=true;}});document.addEventListener('drop',e=>{e.preventDefault();dragDepth=0;$('#dropOverlay').hidden=true;if(!$('#lcms').hidden){window.lcImportFiles(Array.from(e.dataTransfer.files));return;}if(!$('#sessions').hidden)return;($('#analysis').hidden?upload:window.importRuns)(Array.from(e.dataTransfer.files));});
 function openViewer(index){active=index;updateViewer();if(!$('#viewer').open)$('#viewer').showModal();}
 function updateViewer(){const row=rows[active];$('#viewerImage').src=urls[active];$('#viewerImage').alt=row.caption||row.name;$('#viewerCaption').textContent=row.caption||row.name;$('#viewerDate').textContent='Added '+fullDate(row);$('#viewerIndex').textContent=String(active+1).padStart(2,'0')+' / '+String(rows.length).padStart(2,'0');$('#previous').disabled=active===0;$('#next').disabled=active===rows.length-1;}
 $('#closeViewer').onclick=()=>$('#viewer').close();$('#previous').onclick=()=>{if(active>0){active--;updateViewer();}};$('#next').onclick=()=>{if(active<rows.length-1){active++;updateViewer();}};$('#viewer').addEventListener('keydown',e=>{if(e.key==='ArrowLeft')$('#previous').click();if(e.key==='ArrowRight')$('#next').click();});$('#viewer').onclick=e=>{if(e.target===$('#viewer'))$('#viewer').close();};document.addEventListener('click',e=>{document.querySelectorAll('.more[open]').forEach(d=>{if(!d.contains(e.target))d.open=false;});});window.addEventListener('resize',()=>document.querySelectorAll('.caption').forEach(fit));window.addEventListener('beforeunload',e=>{if(saves.size||busy){e.preventDefault();e.returnValue='';}});
@@ -362,10 +377,10 @@ const palette=['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b'];
 let serial=0,revision=0,loading=false,worker;
 const q=JSON.stringify;
 function activate(){
-  const history=location.hash==='#sessions',lab=location.hash==='#analysis';
-  $('#analysis').hidden=!lab;$('#photos').hidden=lab||history;$('#sessions').hidden=!history;if(history)listSessions();
+  const lc=location.hash==='#lcms';$('#lcms').hidden=!lc;const history=location.hash==='#sessions',lab=location.hash==='#analysis';
+  $('#analysis').hidden=!lab;$('#photos').hidden=lab||history||lc;$('#sessions').hidden=!history;if(history)listSessions();
   document.querySelectorAll('nav a').forEach(a=>{
-    if(a.hash===(history?'#sessions':lab?'#analysis':'#photos'))a.setAttribute('aria-current','page');
+    if(a.hash===(lc?'#lcms':history?'#sessions':lab?'#analysis':'#photos'))a.setAttribute('aria-current','page');
     else a.removeAttribute('aria-current');
   });
   if(!lab)document.querySelectorAll('.caption').forEach(fit);
@@ -722,5 +737,2043 @@ async function openSession(id){
 }
 
 activate();
+})();
+</script><script type="text/plain" id="lcWorker">/*
+# Blue Oak Model License
+
+Version 1.0.0
+
+## Purpose
+
+This license gives everyone as much permission to work with
+this software as possible, while protecting contributors
+from liability.
+
+## Acceptance
+
+In order to receive this license, you must agree to its
+rules.  The rules of this license are both obligations
+under that agreement and conditions to your license.
+You must not do anything with this software that triggers
+a rule that you cannot or will not follow.
+
+## Copyright
+
+Each contributor licenses you to do everything with this
+software that would otherwise infringe that contributor's
+copyright in it.
+
+## Notices
+
+You must ensure that everyone who gets a copy of
+any part of this software from you, with or without
+changes, also gets the text of this license or a link to
+<https://blueoakcouncil.org/license/1.0.0>.
+
+## Excuse
+
+If anyone notifies you in writing that you have not
+complied with [Notices](#notices), you can keep your
+license by taking all practical steps to comply within 30
+days after the notice.  If you do not do so, your license
+ends immediately.
+
+## Patent
+
+Each contributor licenses you to do everything with this
+software that would otherwise infringe any patent claims
+they can license or become able to license.
+
+## Reliability
+
+No contributor can revoke this license.
+
+## No Liability
+
+***As far as the law allows, this software comes as is,
+without any warranty or condition, and no contributor
+will be liable to anyone for any damages related to this
+software or this license, under any kind of legal claim.***
+
+*/
+;(function (sax) {
+  // wrapper for non-node envs
+  sax.parser = function (strict, opt) {
+    return new SAXParser(strict, opt)
+  }
+  sax.SAXParser = SAXParser
+  sax.SAXStream = SAXStream
+  sax.createStream = createStream
+
+  // When we pass the MAX_BUFFER_LENGTH position, start checking for buffer overruns.
+  // When we check, schedule the next check for MAX_BUFFER_LENGTH - (max(buffer lengths)),
+  // since that's the earliest that a buffer overrun could occur.  This way, checks are
+  // as rare as required, but as often as necessary to ensure never crossing this bound.
+  // Furthermore, buffers are only tested at most once per write(), so passing a very
+  // large string into write() might have undesirable effects, but this is manageable by
+  // the caller, so it is assumed to be safe.  Thus, a call to write() may, in the extreme
+  // edge case, result in creating at most one complete copy of the string passed in.
+  // Set to Infinity to have unlimited buffers.
+  sax.MAX_BUFFER_LENGTH = 64 * 1024
+
+  var buffers = [
+    'comment',
+    'sgmlDecl',
+    'textNode',
+    'tagName',
+    'doctype',
+    'procInstName',
+    'procInstBody',
+    'entity',
+    'attribName',
+    'attribValue',
+    'cdata',
+    'script',
+  ]
+
+  sax.EVENTS = [
+    'text',
+    'processinginstruction',
+    'sgmldeclaration',
+    'doctype',
+    'comment',
+    'opentagstart',
+    'attribute',
+    'opentag',
+    'closetag',
+    'opencdata',
+    'cdata',
+    'closecdata',
+    'error',
+    'end',
+    'ready',
+    'script',
+    'opennamespace',
+    'closenamespace',
+  ]
+
+  function SAXParser(strict, opt) {
+    if (!(this instanceof SAXParser)) {
+      return new SAXParser(strict, opt)
+    }
+
+    var parser = this
+    clearBuffers(parser)
+    parser.q = parser.c = ''
+    parser.bufferCheckPosition = sax.MAX_BUFFER_LENGTH
+    parser.opt = opt || {}
+    parser.opt.lowercase = parser.opt.lowercase || parser.opt.lowercasetags
+    parser.looseCase = parser.opt.lowercase ? 'toLowerCase' : 'toUpperCase'
+    parser.tags = []
+    parser.closed = parser.closedRoot = parser.sawRoot = false
+    parser.tag = parser.error = null
+    parser.strict = !!strict
+    parser.noscript = !!(strict || parser.opt.noscript)
+    parser.state = S.BEGIN
+    parser.strictEntities = parser.opt.strictEntities
+    parser.ENTITIES =
+      parser.strictEntities ?
+        Object.create(sax.XML_ENTITIES)
+      : Object.create(sax.ENTITIES)
+    parser.attribList = []
+
+    // namespaces form a prototype chain.
+    // it always points at the current tag,
+    // which protos to its parent tag.
+    if (parser.opt.xmlns) {
+      parser.ns = Object.create(rootNS)
+    }
+
+    // disallow unquoted attribute values if not otherwise configured
+    // and strict mode is true
+    if (parser.opt.unquotedAttributeValues === undefined) {
+      parser.opt.unquotedAttributeValues = !strict
+    }
+
+    // mostly just for error reporting
+    parser.trackPosition = parser.opt.position !== false
+    if (parser.trackPosition) {
+      parser.position = parser.line = parser.column = 0
+    }
+    emit(parser, 'onready')
+  }
+
+  if (!Object.create) {
+    Object.create = function (o) {
+      function F() {}
+      F.prototype = o
+      var newf = new F()
+      return newf
+    }
+  }
+
+  if (!Object.keys) {
+    Object.keys = function (o) {
+      var a = []
+      for (var i in o) if (o.hasOwnProperty(i)) a.push(i)
+      return a
+    }
+  }
+
+  function checkBufferLength(parser) {
+    var maxAllowed = Math.max(sax.MAX_BUFFER_LENGTH, 10)
+    var maxActual = 0
+    for (var i = 0, l = buffers.length; i < l; i++) {
+      var len = parser[buffers[i]].length
+      if (len > maxAllowed) {
+        // Text/cdata nodes can get big, and since they're buffered,
+        // we can get here under normal conditions.
+        // Avoid issues by emitting the text node now,
+        // so at least it won't get any bigger.
+        switch (buffers[i]) {
+          case 'textNode':
+            closeText(parser)
+            break
+
+          case 'cdata':
+            emitNode(parser, 'oncdata', parser.cdata)
+            parser.cdata = ''
+            break
+
+          case 'script':
+            emitNode(parser, 'onscript', parser.script)
+            parser.script = ''
+            break
+
+          default:
+            error(parser, 'Max buffer length exceeded: ' + buffers[i])
+        }
+      }
+      maxActual = Math.max(maxActual, len)
+    }
+    // schedule the next check for the earliest possible buffer overrun.
+    var m = sax.MAX_BUFFER_LENGTH - maxActual
+    parser.bufferCheckPosition = m + parser.position
+  }
+
+  function clearBuffers(parser) {
+    for (var i = 0, l = buffers.length; i < l; i++) {
+      parser[buffers[i]] = ''
+    }
+  }
+
+  function flushBuffers(parser) {
+    closeText(parser)
+    if (parser.cdata !== '') {
+      emitNode(parser, 'oncdata', parser.cdata)
+      parser.cdata = ''
+    }
+    if (parser.script !== '') {
+      emitNode(parser, 'onscript', parser.script)
+      parser.script = ''
+    }
+  }
+
+  SAXParser.prototype = {
+    end: function () {
+      end(this)
+    },
+    write: write,
+    resume: function () {
+      this.error = null
+      return this
+    },
+    close: function () {
+      return this.write(null)
+    },
+    flush: function () {
+      flushBuffers(this)
+    },
+  }
+
+  var Stream
+  try {
+    Stream = require('stream').Stream
+  } catch (ex) {
+    Stream = function () {}
+  }
+  if (!Stream) Stream = function () {}
+
+  var streamWraps = sax.EVENTS.filter(function (ev) {
+    return ev !== 'error' && ev !== 'end'
+  })
+
+  function createStream(strict, opt) {
+    return new SAXStream(strict, opt)
+  }
+
+  function SAXStream(strict, opt) {
+    if (!(this instanceof SAXStream)) {
+      return new SAXStream(strict, opt)
+    }
+
+    Stream.apply(this)
+
+    this._parser = new SAXParser(strict, opt)
+    this.writable = true
+    this.readable = true
+
+    var me = this
+
+    this._parser.onend = function () {
+      me.emit('end')
+    }
+
+    this._parser.onerror = function (er) {
+      me.emit('error', er)
+
+      // if didn't throw, then means error was handled.
+      // go ahead and clear error, so we can write again.
+      me._parser.error = null
+    }
+
+    this._decoder = null
+
+    streamWraps.forEach(function (ev) {
+      Object.defineProperty(me, 'on' + ev, {
+        get: function () {
+          return me._parser['on' + ev]
+        },
+        set: function (h) {
+          if (!h) {
+            me.removeAllListeners(ev)
+            me._parser['on' + ev] = h
+            return h
+          }
+          me.on(ev, h)
+        },
+        enumerable: true,
+        configurable: false,
+      })
+    })
+  }
+
+  SAXStream.prototype = Object.create(Stream.prototype, {
+    constructor: {
+      value: SAXStream,
+    },
+  })
+
+  SAXStream.prototype.write = function (data) {
+    if (
+      typeof Buffer === 'function' &&
+      typeof Buffer.isBuffer === 'function' &&
+      Buffer.isBuffer(data)
+    ) {
+      if (!this._decoder) {
+        var SD = require('string_decoder').StringDecoder
+        this._decoder = new SD('utf8')
+      }
+      data = this._decoder.write(data)
+    }
+
+    this._parser.write(data.toString())
+    this.emit('data', data)
+    return true
+  }
+
+  SAXStream.prototype.end = function (chunk) {
+    if (chunk && chunk.length) {
+      this.write(chunk)
+    }
+    this._parser.end()
+    return true
+  }
+
+  SAXStream.prototype.on = function (ev, handler) {
+    var me = this
+    if (!me._parser['on' + ev] && streamWraps.indexOf(ev) !== -1) {
+      me._parser['on' + ev] = function () {
+        var args =
+          arguments.length === 1 ?
+            [arguments[0]]
+          : Array.apply(null, arguments)
+        args.splice(0, 0, ev)
+        me.emit.apply(me, args)
+      }
+    }
+
+    return Stream.prototype.on.call(me, ev, handler)
+  }
+
+  // this really needs to be replaced with character classes.
+  // XML allows all manner of ridiculous numbers and digits.
+  var CDATA = '[CDATA['
+  var DOCTYPE = 'DOCTYPE'
+  var XML_NAMESPACE = 'http://www.w3.org/XML/1998/namespace'
+  var XMLNS_NAMESPACE = 'http://www.w3.org/2000/xmlns/'
+  var rootNS = { xml: XML_NAMESPACE, xmlns: XMLNS_NAMESPACE }
+
+  // http://www.w3.org/TR/REC-xml/#NT-NameStartChar
+  // This implementation works on strings, a single character at a time
+  // as such, it cannot ever support astral-plane characters (10000-EFFFF)
+  // without a significant breaking change to either this  parser, or the
+  // JavaScript language.  Implementation of an emoji-capable xml parser
+  // is left as an exercise for the reader.
+  var nameStart =
+    /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/
+
+  var nameBody =
+    /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/
+
+  var entityStart =
+    /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/
+  var entityBody =
+    /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/
+
+  function isWhitespace(c) {
+    return c === ' ' || c === '\n' || c === '\r' || c === '\t'
+  }
+
+  function isQuote(c) {
+    return c === '"' || c === "'"
+  }
+
+  function isAttribEnd(c) {
+    return c === '>' || isWhitespace(c)
+  }
+
+  function isMatch(regex, c) {
+    return regex.test(c)
+  }
+
+  function notMatch(regex, c) {
+    return !isMatch(regex, c)
+  }
+
+  var S = 0
+  sax.STATE = {
+    BEGIN: S++, // leading byte order mark or whitespace
+    BEGIN_WHITESPACE: S++, // leading whitespace
+    TEXT: S++, // general stuff
+    TEXT_ENTITY: S++, // &amp and such.
+    OPEN_WAKA: S++, // <
+    SGML_DECL: S++, // <!BLARG
+    SGML_DECL_QUOTED: S++, // <!BLARG foo "bar
+    DOCTYPE: S++, // <!DOCTYPE
+    DOCTYPE_QUOTED: S++, // <!DOCTYPE "//blah
+    DOCTYPE_DTD: S++, // <!DOCTYPE "//blah" [ ...
+    DOCTYPE_DTD_QUOTED: S++, // <!DOCTYPE "//blah" [ "foo
+    COMMENT_STARTING: S++, // <!-
+    COMMENT: S++, // <!--
+    COMMENT_ENDING: S++, // <!-- blah -
+    COMMENT_ENDED: S++, // <!-- blah --
+    CDATA: S++, // <![CDATA[ something
+    CDATA_ENDING: S++, // ]
+    CDATA_ENDING_2: S++, // ]]
+    PROC_INST: S++, // <?hi
+    PROC_INST_BODY: S++, // <?hi there
+    PROC_INST_ENDING: S++, // <?hi "there" ?
+    OPEN_TAG: S++, // <strong
+    OPEN_TAG_SLASH: S++, // <strong /
+    ATTRIB: S++, // <a
+    ATTRIB_NAME: S++, // <a foo
+    ATTRIB_NAME_SAW_WHITE: S++, // <a foo _
+    ATTRIB_VALUE: S++, // <a foo=
+    ATTRIB_VALUE_QUOTED: S++, // <a foo="bar
+    ATTRIB_VALUE_CLOSED: S++, // <a foo="bar"
+    ATTRIB_VALUE_UNQUOTED: S++, // <a foo=bar
+    ATTRIB_VALUE_ENTITY_Q: S++, // <foo bar="&quot;"
+    ATTRIB_VALUE_ENTITY_U: S++, // <foo bar=&quot
+    CLOSE_TAG: S++, // </a
+    CLOSE_TAG_SAW_WHITE: S++, // </a   >
+    SCRIPT: S++, // <script> ...
+    SCRIPT_ENDING: S++, // <script> ... <
+  }
+
+  sax.XML_ENTITIES = {
+    amp: '&',
+    gt: '>',
+    lt: '<',
+    quot: '"',
+    apos: "'",
+  }
+
+  sax.ENTITIES = {
+    amp: '&',
+    gt: '>',
+    lt: '<',
+    quot: '"',
+    apos: "'",
+    AElig: 198,
+    Aacute: 193,
+    Acirc: 194,
+    Agrave: 192,
+    Aring: 197,
+    Atilde: 195,
+    Auml: 196,
+    Ccedil: 199,
+    ETH: 208,
+    Eacute: 201,
+    Ecirc: 202,
+    Egrave: 200,
+    Euml: 203,
+    Iacute: 205,
+    Icirc: 206,
+    Igrave: 204,
+    Iuml: 207,
+    Ntilde: 209,
+    Oacute: 211,
+    Ocirc: 212,
+    Ograve: 210,
+    Oslash: 216,
+    Otilde: 213,
+    Ouml: 214,
+    THORN: 222,
+    Uacute: 218,
+    Ucirc: 219,
+    Ugrave: 217,
+    Uuml: 220,
+    Yacute: 221,
+    aacute: 225,
+    acirc: 226,
+    aelig: 230,
+    agrave: 224,
+    aring: 229,
+    atilde: 227,
+    auml: 228,
+    ccedil: 231,
+    eacute: 233,
+    ecirc: 234,
+    egrave: 232,
+    eth: 240,
+    euml: 235,
+    iacute: 237,
+    icirc: 238,
+    igrave: 236,
+    iuml: 239,
+    ntilde: 241,
+    oacute: 243,
+    ocirc: 244,
+    ograve: 242,
+    oslash: 248,
+    otilde: 245,
+    ouml: 246,
+    szlig: 223,
+    thorn: 254,
+    uacute: 250,
+    ucirc: 251,
+    ugrave: 249,
+    uuml: 252,
+    yacute: 253,
+    yuml: 255,
+    copy: 169,
+    reg: 174,
+    nbsp: 160,
+    iexcl: 161,
+    cent: 162,
+    pound: 163,
+    curren: 164,
+    yen: 165,
+    brvbar: 166,
+    sect: 167,
+    uml: 168,
+    ordf: 170,
+    laquo: 171,
+    not: 172,
+    shy: 173,
+    macr: 175,
+    deg: 176,
+    plusmn: 177,
+    sup1: 185,
+    sup2: 178,
+    sup3: 179,
+    acute: 180,
+    micro: 181,
+    para: 182,
+    middot: 183,
+    cedil: 184,
+    ordm: 186,
+    raquo: 187,
+    frac14: 188,
+    frac12: 189,
+    frac34: 190,
+    iquest: 191,
+    times: 215,
+    divide: 247,
+    OElig: 338,
+    oelig: 339,
+    Scaron: 352,
+    scaron: 353,
+    Yuml: 376,
+    fnof: 402,
+    circ: 710,
+    tilde: 732,
+    Alpha: 913,
+    Beta: 914,
+    Gamma: 915,
+    Delta: 916,
+    Epsilon: 917,
+    Zeta: 918,
+    Eta: 919,
+    Theta: 920,
+    Iota: 921,
+    Kappa: 922,
+    Lambda: 923,
+    Mu: 924,
+    Nu: 925,
+    Xi: 926,
+    Omicron: 927,
+    Pi: 928,
+    Rho: 929,
+    Sigma: 931,
+    Tau: 932,
+    Upsilon: 933,
+    Phi: 934,
+    Chi: 935,
+    Psi: 936,
+    Omega: 937,
+    alpha: 945,
+    beta: 946,
+    gamma: 947,
+    delta: 948,
+    epsilon: 949,
+    zeta: 950,
+    eta: 951,
+    theta: 952,
+    iota: 953,
+    kappa: 954,
+    lambda: 955,
+    mu: 956,
+    nu: 957,
+    xi: 958,
+    omicron: 959,
+    pi: 960,
+    rho: 961,
+    sigmaf: 962,
+    sigma: 963,
+    tau: 964,
+    upsilon: 965,
+    phi: 966,
+    chi: 967,
+    psi: 968,
+    omega: 969,
+    thetasym: 977,
+    upsih: 978,
+    piv: 982,
+    ensp: 8194,
+    emsp: 8195,
+    thinsp: 8201,
+    zwnj: 8204,
+    zwj: 8205,
+    lrm: 8206,
+    rlm: 8207,
+    ndash: 8211,
+    mdash: 8212,
+    lsquo: 8216,
+    rsquo: 8217,
+    sbquo: 8218,
+    ldquo: 8220,
+    rdquo: 8221,
+    bdquo: 8222,
+    dagger: 8224,
+    Dagger: 8225,
+    bull: 8226,
+    hellip: 8230,
+    permil: 8240,
+    prime: 8242,
+    Prime: 8243,
+    lsaquo: 8249,
+    rsaquo: 8250,
+    oline: 8254,
+    frasl: 8260,
+    euro: 8364,
+    image: 8465,
+    weierp: 8472,
+    real: 8476,
+    trade: 8482,
+    alefsym: 8501,
+    larr: 8592,
+    uarr: 8593,
+    rarr: 8594,
+    darr: 8595,
+    harr: 8596,
+    crarr: 8629,
+    lArr: 8656,
+    uArr: 8657,
+    rArr: 8658,
+    dArr: 8659,
+    hArr: 8660,
+    forall: 8704,
+    part: 8706,
+    exist: 8707,
+    empty: 8709,
+    nabla: 8711,
+    isin: 8712,
+    notin: 8713,
+    ni: 8715,
+    prod: 8719,
+    sum: 8721,
+    minus: 8722,
+    lowast: 8727,
+    radic: 8730,
+    prop: 8733,
+    infin: 8734,
+    ang: 8736,
+    and: 8743,
+    or: 8744,
+    cap: 8745,
+    cup: 8746,
+    int: 8747,
+    there4: 8756,
+    sim: 8764,
+    cong: 8773,
+    asymp: 8776,
+    ne: 8800,
+    equiv: 8801,
+    le: 8804,
+    ge: 8805,
+    sub: 8834,
+    sup: 8835,
+    nsub: 8836,
+    sube: 8838,
+    supe: 8839,
+    oplus: 8853,
+    otimes: 8855,
+    perp: 8869,
+    sdot: 8901,
+    lceil: 8968,
+    rceil: 8969,
+    lfloor: 8970,
+    rfloor: 8971,
+    lang: 9001,
+    rang: 9002,
+    loz: 9674,
+    spades: 9824,
+    clubs: 9827,
+    hearts: 9829,
+    diams: 9830,
+  }
+
+  Object.keys(sax.ENTITIES).forEach(function (key) {
+    var e = sax.ENTITIES[key]
+    var s = typeof e === 'number' ? String.fromCharCode(e) : e
+    sax.ENTITIES[key] = s
+  })
+
+  for (var s in sax.STATE) {
+    sax.STATE[sax.STATE[s]] = s
+  }
+
+  // shorthand
+  S = sax.STATE
+
+  function emit(parser, event, data) {
+    parser[event] && parser[event](data)
+  }
+
+  function emitNode(parser, nodeType, data) {
+    if (parser.textNode) closeText(parser)
+    emit(parser, nodeType, data)
+  }
+
+  function closeText(parser) {
+    parser.textNode = textopts(parser.opt, parser.textNode)
+    if (parser.textNode) emit(parser, 'ontext', parser.textNode)
+    parser.textNode = ''
+  }
+
+  function textopts(opt, text) {
+    if (opt.trim) text = text.trim()
+    if (opt.normalize) text = text.replace(/\s+/g, ' ')
+    return text
+  }
+
+  function error(parser, er) {
+    closeText(parser)
+    if (parser.trackPosition) {
+      er +=
+        '\nLine: ' +
+        parser.line +
+        '\nColumn: ' +
+        parser.column +
+        '\nChar: ' +
+        parser.c
+    }
+    er = new Error(er)
+    parser.error = er
+    emit(parser, 'onerror', er)
+    return parser
+  }
+
+  function end(parser) {
+    if (parser.sawRoot && !parser.closedRoot)
+      strictFail(parser, 'Unclosed root tag')
+    if (
+      parser.state !== S.BEGIN &&
+      parser.state !== S.BEGIN_WHITESPACE &&
+      parser.state !== S.TEXT
+    ) {
+      error(parser, 'Unexpected end')
+    }
+    closeText(parser)
+    parser.c = ''
+    parser.closed = true
+    emit(parser, 'onend')
+    SAXParser.call(parser, parser.strict, parser.opt)
+    return parser
+  }
+
+  function strictFail(parser, message) {
+    if (typeof parser !== 'object' || !(parser instanceof SAXParser)) {
+      throw new Error('bad call to strictFail')
+    }
+    if (parser.strict) {
+      error(parser, message)
+    }
+  }
+
+  function newTag(parser) {
+    if (!parser.strict) parser.tagName = parser.tagName[parser.looseCase]()
+    var parent = parser.tags[parser.tags.length - 1] || parser
+    var tag = (parser.tag = { name: parser.tagName, attributes: {} })
+
+    // will be overridden if tag contails an xmlns="foo" or xmlns:foo="bar"
+    if (parser.opt.xmlns) {
+      tag.ns = parent.ns
+    }
+    parser.attribList.length = 0
+    emitNode(parser, 'onopentagstart', tag)
+  }
+
+  function qname(name, attribute) {
+    var i = name.indexOf(':')
+    var qualName = i < 0 ? ['', name] : name.split(':')
+    var prefix = qualName[0]
+    var local = qualName[1]
+
+    // <x "xmlns"="http://foo">
+    if (attribute && name === 'xmlns') {
+      prefix = 'xmlns'
+      local = ''
+    }
+
+    return { prefix: prefix, local: local }
+  }
+
+  function attrib(parser) {
+    if (!parser.strict) {
+      parser.attribName = parser.attribName[parser.looseCase]()
+    }
+
+    if (
+      parser.attribList.indexOf(parser.attribName) !== -1 ||
+      parser.tag.attributes.hasOwnProperty(parser.attribName)
+    ) {
+      parser.attribName = parser.attribValue = ''
+      return
+    }
+
+    if (parser.opt.xmlns) {
+      var qn = qname(parser.attribName, true)
+      var prefix = qn.prefix
+      var local = qn.local
+
+      if (prefix === 'xmlns') {
+        // namespace binding attribute. push the binding into scope
+        if (local === 'xml' && parser.attribValue !== XML_NAMESPACE) {
+          strictFail(
+            parser,
+            'xml: prefix must be bound to ' +
+              XML_NAMESPACE +
+              '\n' +
+              'Actual: ' +
+              parser.attribValue
+          )
+        } else if (
+          local === 'xmlns' &&
+          parser.attribValue !== XMLNS_NAMESPACE
+        ) {
+          strictFail(
+            parser,
+            'xmlns: prefix must be bound to ' +
+              XMLNS_NAMESPACE +
+              '\n' +
+              'Actual: ' +
+              parser.attribValue
+          )
+        } else {
+          var tag = parser.tag
+          var parent = parser.tags[parser.tags.length - 1] || parser
+          if (tag.ns === parent.ns) {
+            tag.ns = Object.create(parent.ns)
+          }
+          tag.ns[local] = parser.attribValue
+        }
+      }
+
+      // defer onattribute events until all attributes have been seen
+      // so any new bindings can take effect. preserve attribute order
+      // so deferred events can be emitted in document order
+      parser.attribList.push([parser.attribName, parser.attribValue])
+    } else {
+      // in non-xmlns mode, we can emit the event right away
+      parser.tag.attributes[parser.attribName] = parser.attribValue
+      emitNode(parser, 'onattribute', {
+        name: parser.attribName,
+        value: parser.attribValue,
+      })
+    }
+
+    parser.attribName = parser.attribValue = ''
+  }
+
+  function openTag(parser, selfClosing) {
+    if (parser.opt.xmlns) {
+      // emit namespace binding events
+      var tag = parser.tag
+
+      // add namespace info to tag
+      var qn = qname(parser.tagName)
+      tag.prefix = qn.prefix
+      tag.local = qn.local
+      tag.uri = tag.ns[qn.prefix] || ''
+
+      if (tag.prefix && !tag.uri) {
+        strictFail(
+          parser,
+          'Unbound namespace prefix: ' + JSON.stringify(parser.tagName)
+        )
+        tag.uri = qn.prefix
+      }
+
+      var parent = parser.tags[parser.tags.length - 1] || parser
+      if (tag.ns && parent.ns !== tag.ns) {
+        Object.keys(tag.ns).forEach(function (p) {
+          emitNode(parser, 'onopennamespace', {
+            prefix: p,
+            uri: tag.ns[p],
+          })
+        })
+      }
+
+      // handle deferred onattribute events
+      // Note: do not apply default ns to attributes:
+      //   http://www.w3.org/TR/REC-xml-names/#defaulting
+      for (var i = 0, l = parser.attribList.length; i < l; i++) {
+        var nv = parser.attribList[i]
+        var name = nv[0]
+        var value = nv[1]
+        var qualName = qname(name, true)
+        var prefix = qualName.prefix
+        var local = qualName.local
+        var uri = prefix === '' ? '' : tag.ns[prefix] || ''
+        var a = {
+          name: name,
+          value: value,
+          prefix: prefix,
+          local: local,
+          uri: uri,
+        }
+
+        // if there's any attributes with an undefined namespace,
+        // then fail on them now.
+        if (prefix && prefix !== 'xmlns' && !uri) {
+          strictFail(
+            parser,
+            'Unbound namespace prefix: ' + JSON.stringify(prefix)
+          )
+          a.uri = prefix
+        }
+        parser.tag.attributes[name] = a
+        emitNode(parser, 'onattribute', a)
+      }
+      parser.attribList.length = 0
+    }
+
+    parser.tag.isSelfClosing = !!selfClosing
+
+    // process the tag
+    parser.sawRoot = true
+    parser.tags.push(parser.tag)
+    emitNode(parser, 'onopentag', parser.tag)
+    if (!selfClosing) {
+      // special case for <script> in non-strict mode.
+      if (!parser.noscript && parser.tagName.toLowerCase() === 'script') {
+        parser.state = S.SCRIPT
+      } else {
+        parser.state = S.TEXT
+      }
+      parser.tag = null
+      parser.tagName = ''
+    }
+    parser.attribName = parser.attribValue = ''
+    parser.attribList.length = 0
+  }
+
+  function closeTag(parser) {
+    if (!parser.tagName) {
+      strictFail(parser, 'Weird empty close tag.')
+      parser.textNode += '</>'
+      parser.state = S.TEXT
+      return
+    }
+
+    if (parser.script) {
+      if (parser.tagName !== 'script') {
+        parser.script += '</' + parser.tagName + '>'
+        parser.tagName = ''
+        parser.state = S.SCRIPT
+        return
+      }
+      emitNode(parser, 'onscript', parser.script)
+      parser.script = ''
+    }
+
+    // first make sure that the closing tag actually exists.
+    // <a><b></c></b></a> will close everything, otherwise.
+    var t = parser.tags.length
+    var tagName = parser.tagName
+    if (!parser.strict) {
+      tagName = tagName[parser.looseCase]()
+    }
+    var closeTo = tagName
+    while (t--) {
+      var close = parser.tags[t]
+      if (close.name !== closeTo) {
+        // fail the first time in strict mode
+        strictFail(parser, 'Unexpected close tag')
+      } else {
+        break
+      }
+    }
+
+    // didn't find it.  we already failed for strict, so just abort.
+    if (t < 0) {
+      strictFail(parser, 'Unmatched closing tag: ' + parser.tagName)
+      parser.textNode += '</' + parser.tagName + '>'
+      parser.state = S.TEXT
+      return
+    }
+    parser.tagName = tagName
+    var s = parser.tags.length
+    while (s-- > t) {
+      var tag = (parser.tag = parser.tags.pop())
+      parser.tagName = parser.tag.name
+      emitNode(parser, 'onclosetag', parser.tagName)
+
+      var x = {}
+      for (var i in tag.ns) {
+        x[i] = tag.ns[i]
+      }
+
+      var parent = parser.tags[parser.tags.length - 1] || parser
+      if (parser.opt.xmlns && tag.ns !== parent.ns) {
+        // remove namespace bindings introduced by tag
+        Object.keys(tag.ns).forEach(function (p) {
+          var n = tag.ns[p]
+          emitNode(parser, 'onclosenamespace', { prefix: p, uri: n })
+        })
+      }
+    }
+    if (t === 0) parser.closedRoot = true
+    parser.tagName = parser.attribValue = parser.attribName = ''
+    parser.attribList.length = 0
+    parser.state = S.TEXT
+  }
+
+  function parseEntity(parser) {
+    var entity = parser.entity
+    var entityLC = entity.toLowerCase()
+    var num
+    var numStr = ''
+
+    if (parser.ENTITIES[entity]) {
+      return parser.ENTITIES[entity]
+    }
+    if (parser.ENTITIES[entityLC]) {
+      return parser.ENTITIES[entityLC]
+    }
+    entity = entityLC
+    if (entity.charAt(0) === '#') {
+      if (entity.charAt(1) === 'x') {
+        entity = entity.slice(2)
+        num = parseInt(entity, 16)
+        numStr = num.toString(16)
+      } else {
+        entity = entity.slice(1)
+        num = parseInt(entity, 10)
+        numStr = num.toString(10)
+      }
+    }
+    entity = entity.replace(/^0+/, '')
+    if (
+      isNaN(num) ||
+      numStr.toLowerCase() !== entity ||
+      num < 0 ||
+      num > 0x10ffff
+    ) {
+      strictFail(parser, 'Invalid character entity')
+      return '&' + parser.entity + ';'
+    }
+
+    return String.fromCodePoint(num)
+  }
+
+  function beginWhiteSpace(parser, c) {
+    if (c === '<') {
+      parser.state = S.OPEN_WAKA
+      parser.startTagPosition = parser.position
+    } else if (!isWhitespace(c)) {
+      // have to process this as a text node.
+      // weird, but happens.
+      strictFail(parser, 'Non-whitespace before first tag.')
+      parser.textNode = c
+      parser.state = S.TEXT
+    }
+  }
+
+  function charAt(chunk, i) {
+    var result = ''
+    if (i < chunk.length) {
+      result = chunk.charAt(i)
+    }
+    return result
+  }
+
+  function write(chunk) {
+    var parser = this
+    if (this.error) {
+      throw this.error
+    }
+    if (parser.closed) {
+      return error(
+        parser,
+        'Cannot write after close. Assign an onready handler.'
+      )
+    }
+    if (chunk === null) {
+      return end(parser)
+    }
+    if (typeof chunk === 'object') {
+      chunk = chunk.toString()
+    }
+    var i = 0
+    var c = ''
+    while (true) {
+      c = charAt(chunk, i++)
+      parser.c = c
+
+      if (!c) {
+        break
+      }
+
+      if (parser.trackPosition) {
+        parser.position++
+        if (c === '\n') {
+          parser.line++
+          parser.column = 0
+        } else {
+          parser.column++
+        }
+      }
+
+      switch (parser.state) {
+        case S.BEGIN:
+          parser.state = S.BEGIN_WHITESPACE
+          if (c === '\uFEFF') {
+            continue
+          }
+          beginWhiteSpace(parser, c)
+          continue
+
+        case S.BEGIN_WHITESPACE:
+          beginWhiteSpace(parser, c)
+          continue
+
+        case S.TEXT:
+          if (parser.sawRoot && !parser.closedRoot) {
+            var starti = i - 1
+            while (c && c !== '<' && c !== '&') {
+              c = charAt(chunk, i++)
+              if (c && parser.trackPosition) {
+                parser.position++
+                if (c === '\n') {
+                  parser.line++
+                  parser.column = 0
+                } else {
+                  parser.column++
+                }
+              }
+            }
+            parser.textNode += chunk.substring(starti, i - 1)
+          }
+          if (
+            c === '<' &&
+            !(parser.sawRoot && parser.closedRoot && !parser.strict)
+          ) {
+            parser.state = S.OPEN_WAKA
+            parser.startTagPosition = parser.position
+          } else {
+            if (
+              !isWhitespace(c) &&
+              (!parser.sawRoot || parser.closedRoot)
+            ) {
+              strictFail(parser, 'Text data outside of root node.')
+            }
+            if (c === '&') {
+              parser.state = S.TEXT_ENTITY
+            } else {
+              parser.textNode += c
+            }
+          }
+          continue
+
+        case S.SCRIPT:
+          // only non-strict
+          if (c === '<') {
+            parser.state = S.SCRIPT_ENDING
+          } else {
+            parser.script += c
+          }
+          continue
+
+        case S.SCRIPT_ENDING:
+          if (c === '/') {
+            parser.state = S.CLOSE_TAG
+          } else {
+            parser.script += '<' + c
+            parser.state = S.SCRIPT
+          }
+          continue
+
+        case S.OPEN_WAKA:
+          // either a /, ?, !, or text is coming next.
+          if (c === '!') {
+            parser.state = S.SGML_DECL
+            parser.sgmlDecl = ''
+          } else if (isWhitespace(c)) {
+            // wait for it...
+          } else if (isMatch(nameStart, c)) {
+            parser.state = S.OPEN_TAG
+            parser.tagName = c
+          } else if (c === '/') {
+            parser.state = S.CLOSE_TAG
+            parser.tagName = ''
+          } else if (c === '?') {
+            parser.state = S.PROC_INST
+            parser.procInstName = parser.procInstBody = ''
+          } else {
+            strictFail(parser, 'Unencoded <')
+            // if there was some whitespace, then add that in.
+            if (parser.startTagPosition + 1 < parser.position) {
+              var pad = parser.position - parser.startTagPosition
+              c = new Array(pad).join(' ') + c
+            }
+            parser.textNode += '<' + c
+            parser.state = S.TEXT
+          }
+          continue
+
+        case S.SGML_DECL:
+          if (parser.sgmlDecl + c === '--') {
+            parser.state = S.COMMENT
+            parser.comment = ''
+            parser.sgmlDecl = ''
+            continue
+          }
+
+          if (
+            parser.doctype &&
+            parser.doctype !== true &&
+            parser.sgmlDecl
+          ) {
+            parser.state = S.DOCTYPE_DTD
+            parser.doctype += '<!' + parser.sgmlDecl + c
+            parser.sgmlDecl = ''
+          } else if ((parser.sgmlDecl + c).toUpperCase() === CDATA) {
+            emitNode(parser, 'onopencdata')
+            parser.state = S.CDATA
+            parser.sgmlDecl = ''
+            parser.cdata = ''
+          } else if ((parser.sgmlDecl + c).toUpperCase() === DOCTYPE) {
+            parser.state = S.DOCTYPE
+            if (parser.doctype || parser.sawRoot) {
+              strictFail(
+                parser,
+                'Inappropriately located doctype declaration'
+              )
+            }
+            parser.doctype = ''
+            parser.sgmlDecl = ''
+          } else if (c === '>') {
+            emitNode(parser, 'onsgmldeclaration', parser.sgmlDecl)
+            parser.sgmlDecl = ''
+            parser.state = S.TEXT
+          } else if (isQuote(c)) {
+            parser.state = S.SGML_DECL_QUOTED
+            parser.sgmlDecl += c
+          } else {
+            parser.sgmlDecl += c
+          }
+          continue
+
+        case S.SGML_DECL_QUOTED:
+          if (c === parser.q) {
+            parser.state = S.SGML_DECL
+            parser.q = ''
+          }
+          parser.sgmlDecl += c
+          continue
+
+        case S.DOCTYPE:
+          if (c === '>') {
+            parser.state = S.TEXT
+            emitNode(parser, 'ondoctype', parser.doctype)
+            parser.doctype = true // just remember that we saw it.
+          } else {
+            parser.doctype += c
+            if (c === '[') {
+              parser.state = S.DOCTYPE_DTD
+            } else if (isQuote(c)) {
+              parser.state = S.DOCTYPE_QUOTED
+              parser.q = c
+            }
+          }
+          continue
+
+        case S.DOCTYPE_QUOTED:
+          parser.doctype += c
+          if (c === parser.q) {
+            parser.q = ''
+            parser.state = S.DOCTYPE
+          }
+          continue
+
+        case S.DOCTYPE_DTD:
+          if (c === ']') {
+            parser.doctype += c
+            parser.state = S.DOCTYPE
+          } else if (c === '<') {
+            parser.state = S.OPEN_WAKA
+            parser.startTagPosition = parser.position
+          } else if (isQuote(c)) {
+            parser.doctype += c
+            parser.state = S.DOCTYPE_DTD_QUOTED
+            parser.q = c
+          } else {
+            parser.doctype += c
+          }
+          continue
+
+        case S.DOCTYPE_DTD_QUOTED:
+          parser.doctype += c
+          if (c === parser.q) {
+            parser.state = S.DOCTYPE_DTD
+            parser.q = ''
+          }
+          continue
+
+        case S.COMMENT:
+          if (c === '-') {
+            parser.state = S.COMMENT_ENDING
+          } else {
+            parser.comment += c
+          }
+          continue
+
+        case S.COMMENT_ENDING:
+          if (c === '-') {
+            parser.state = S.COMMENT_ENDED
+            parser.comment = textopts(parser.opt, parser.comment)
+            if (parser.comment) {
+              emitNode(parser, 'oncomment', parser.comment)
+            }
+            parser.comment = ''
+          } else {
+            parser.comment += '-' + c
+            parser.state = S.COMMENT
+          }
+          continue
+
+        case S.COMMENT_ENDED:
+          if (c !== '>') {
+            strictFail(parser, 'Malformed comment')
+            // allow <!-- blah -- bloo --> in non-strict mode,
+            // which is a comment of " blah -- bloo "
+            parser.comment += '--' + c
+            parser.state = S.COMMENT
+          } else if (parser.doctype && parser.doctype !== true) {
+            parser.state = S.DOCTYPE_DTD
+          } else {
+            parser.state = S.TEXT
+          }
+          continue
+
+        case S.CDATA:
+          var starti = i - 1
+          while (c && c !== ']') {
+            c = charAt(chunk, i++)
+            if (c && parser.trackPosition) {
+              parser.position++
+              if (c === '\n') {
+                parser.line++
+                parser.column = 0
+              } else {
+                parser.column++
+              }
+            }
+          }
+          parser.cdata += chunk.substring(starti, i - 1)
+          if (c === ']') {
+            parser.state = S.CDATA_ENDING
+          }
+          continue
+
+        case S.CDATA_ENDING:
+          if (c === ']') {
+            parser.state = S.CDATA_ENDING_2
+          } else {
+            parser.cdata += ']' + c
+            parser.state = S.CDATA
+          }
+          continue
+
+        case S.CDATA_ENDING_2:
+          if (c === '>') {
+            if (parser.cdata) {
+              emitNode(parser, 'oncdata', parser.cdata)
+            }
+            emitNode(parser, 'onclosecdata')
+            parser.cdata = ''
+            parser.state = S.TEXT
+          } else if (c === ']') {
+            parser.cdata += ']'
+          } else {
+            parser.cdata += ']]' + c
+            parser.state = S.CDATA
+          }
+          continue
+
+        case S.PROC_INST:
+          if (c === '?') {
+            parser.state = S.PROC_INST_ENDING
+          } else if (isWhitespace(c)) {
+            parser.state = S.PROC_INST_BODY
+          } else {
+            parser.procInstName += c
+          }
+          continue
+
+        case S.PROC_INST_BODY:
+          if (!parser.procInstBody && isWhitespace(c)) {
+            continue
+          } else if (c === '?') {
+            parser.state = S.PROC_INST_ENDING
+          } else {
+            parser.procInstBody += c
+          }
+          continue
+
+        case S.PROC_INST_ENDING:
+          if (c === '>') {
+            emitNode(parser, 'onprocessinginstruction', {
+              name: parser.procInstName,
+              body: parser.procInstBody,
+            })
+            parser.procInstName = parser.procInstBody = ''
+            parser.state = S.TEXT
+          } else {
+            parser.procInstBody += '?' + c
+            parser.state = S.PROC_INST_BODY
+          }
+          continue
+
+        case S.OPEN_TAG:
+          if (isMatch(nameBody, c)) {
+            parser.tagName += c
+          } else {
+            newTag(parser)
+            if (c === '>') {
+              openTag(parser)
+            } else if (c === '/') {
+              parser.state = S.OPEN_TAG_SLASH
+            } else {
+              if (!isWhitespace(c)) {
+                strictFail(parser, 'Invalid character in tag name')
+              }
+              parser.state = S.ATTRIB
+            }
+          }
+          continue
+
+        case S.OPEN_TAG_SLASH:
+          if (c === '>') {
+            openTag(parser, true)
+            closeTag(parser)
+          } else {
+            strictFail(
+              parser,
+              'Forward-slash in opening tag not followed by >'
+            )
+            parser.state = S.ATTRIB
+          }
+          continue
+
+        case S.ATTRIB:
+          // haven't read the attribute name yet.
+          if (isWhitespace(c)) {
+            continue
+          } else if (c === '>') {
+            openTag(parser)
+          } else if (c === '/') {
+            parser.state = S.OPEN_TAG_SLASH
+          } else if (isMatch(nameStart, c)) {
+            parser.attribName = c
+            parser.attribValue = ''
+            parser.state = S.ATTRIB_NAME
+          } else {
+            strictFail(parser, 'Invalid attribute name')
+          }
+          continue
+
+        case S.ATTRIB_NAME:
+          if (c === '=') {
+            parser.state = S.ATTRIB_VALUE
+          } else if (c === '>') {
+            strictFail(parser, 'Attribute without value')
+            parser.attribValue = parser.attribName
+            attrib(parser)
+            openTag(parser)
+          } else if (isWhitespace(c)) {
+            parser.state = S.ATTRIB_NAME_SAW_WHITE
+          } else if (isMatch(nameBody, c)) {
+            parser.attribName += c
+          } else {
+            strictFail(parser, 'Invalid attribute name')
+          }
+          continue
+
+        case S.ATTRIB_NAME_SAW_WHITE:
+          if (c === '=') {
+            parser.state = S.ATTRIB_VALUE
+          } else if (isWhitespace(c)) {
+            continue
+          } else {
+            strictFail(parser, 'Attribute without value')
+            parser.tag.attributes[parser.attribName] = ''
+            parser.attribValue = ''
+            emitNode(parser, 'onattribute', {
+              name: parser.attribName,
+              value: '',
+            })
+            parser.attribName = ''
+            if (c === '>') {
+              openTag(parser)
+            } else if (isMatch(nameStart, c)) {
+              parser.attribName = c
+              parser.state = S.ATTRIB_NAME
+            } else {
+              strictFail(parser, 'Invalid attribute name')
+              parser.state = S.ATTRIB
+            }
+          }
+          continue
+
+        case S.ATTRIB_VALUE:
+          if (isWhitespace(c)) {
+            continue
+          } else if (isQuote(c)) {
+            parser.q = c
+            parser.state = S.ATTRIB_VALUE_QUOTED
+          } else {
+            if (!parser.opt.unquotedAttributeValues) {
+              error(parser, 'Unquoted attribute value')
+            }
+            parser.state = S.ATTRIB_VALUE_UNQUOTED
+            parser.attribValue = c
+          }
+          continue
+
+        case S.ATTRIB_VALUE_QUOTED:
+          if (c !== parser.q) {
+            if (c === '&') {
+              parser.state = S.ATTRIB_VALUE_ENTITY_Q
+            } else {
+              parser.attribValue += c
+            }
+            continue
+          }
+          attrib(parser)
+          parser.q = ''
+          parser.state = S.ATTRIB_VALUE_CLOSED
+          continue
+
+        case S.ATTRIB_VALUE_CLOSED:
+          if (isWhitespace(c)) {
+            parser.state = S.ATTRIB
+          } else if (c === '>') {
+            openTag(parser)
+          } else if (c === '/') {
+            parser.state = S.OPEN_TAG_SLASH
+          } else if (isMatch(nameStart, c)) {
+            strictFail(parser, 'No whitespace between attributes')
+            parser.attribName = c
+            parser.attribValue = ''
+            parser.state = S.ATTRIB_NAME
+          } else {
+            strictFail(parser, 'Invalid attribute name')
+          }
+          continue
+
+        case S.ATTRIB_VALUE_UNQUOTED:
+          if (!isAttribEnd(c)) {
+            if (c === '&') {
+              parser.state = S.ATTRIB_VALUE_ENTITY_U
+            } else {
+              parser.attribValue += c
+            }
+            continue
+          }
+          attrib(parser)
+          if (c === '>') {
+            openTag(parser)
+          } else {
+            parser.state = S.ATTRIB
+          }
+          continue
+
+        case S.CLOSE_TAG:
+          if (!parser.tagName) {
+            if (isWhitespace(c)) {
+              continue
+            } else if (notMatch(nameStart, c)) {
+              if (parser.script) {
+                parser.script += '</' + c
+                parser.state = S.SCRIPT
+              } else {
+                strictFail(parser, 'Invalid tagname in closing tag.')
+              }
+            } else {
+              parser.tagName = c
+            }
+          } else if (c === '>') {
+            closeTag(parser)
+          } else if (isMatch(nameBody, c)) {
+            parser.tagName += c
+          } else if (parser.script) {
+            parser.script += '</' + parser.tagName
+            parser.tagName = ''
+            parser.state = S.SCRIPT
+          } else {
+            if (!isWhitespace(c)) {
+              strictFail(parser, 'Invalid tagname in closing tag')
+            }
+            parser.state = S.CLOSE_TAG_SAW_WHITE
+          }
+          continue
+
+        case S.CLOSE_TAG_SAW_WHITE:
+          if (isWhitespace(c)) {
+            continue
+          }
+          if (c === '>') {
+            closeTag(parser)
+          } else {
+            strictFail(parser, 'Invalid characters in closing tag')
+          }
+          continue
+
+        case S.TEXT_ENTITY:
+        case S.ATTRIB_VALUE_ENTITY_Q:
+        case S.ATTRIB_VALUE_ENTITY_U:
+          var returnState
+          var buffer
+          switch (parser.state) {
+            case S.TEXT_ENTITY:
+              returnState = S.TEXT
+              buffer = 'textNode'
+              break
+
+            case S.ATTRIB_VALUE_ENTITY_Q:
+              returnState = S.ATTRIB_VALUE_QUOTED
+              buffer = 'attribValue'
+              break
+
+            case S.ATTRIB_VALUE_ENTITY_U:
+              returnState = S.ATTRIB_VALUE_UNQUOTED
+              buffer = 'attribValue'
+              break
+          }
+
+          if (c === ';') {
+            var parsedEntity = parseEntity(parser)
+            if (
+              parser.opt.unparsedEntities &&
+              !Object.values(sax.XML_ENTITIES).includes(parsedEntity)
+            ) {
+              parser.entity = ''
+              parser.state = returnState
+              parser.write(parsedEntity)
+            } else {
+              parser[buffer] += parsedEntity
+              parser.entity = ''
+              parser.state = returnState
+            }
+          } else if (
+            isMatch(parser.entity.length ? entityBody : entityStart, c)
+          ) {
+            parser.entity += c
+          } else {
+            strictFail(parser, 'Invalid character in entity name')
+            parser[buffer] += '&' + parser.entity + c
+            parser.entity = ''
+            parser.state = returnState
+          }
+
+          continue
+
+        default: /* istanbul ignore next */ {
+          throw new Error(parser, 'Unknown state: ' + parser.state)
+        }
+      }
+    } // while
+
+    if (parser.position >= parser.bufferCheckPosition) {
+      checkBufferLength(parser)
+    }
+    return parser
+  }
+
+  /*! http://mths.be/fromcodepoint v0.1.0 by @mathias */
+  /* istanbul ignore next */
+  if (!String.fromCodePoint) {
+    ;(function () {
+      var stringFromCharCode = String.fromCharCode
+      var floor = Math.floor
+      var fromCodePoint = function () {
+        var MAX_SIZE = 0x4000
+        var codeUnits = []
+        var highSurrogate
+        var lowSurrogate
+        var index = -1
+        var length = arguments.length
+        if (!length) {
+          return ''
+        }
+        var result = ''
+        while (++index < length) {
+          var codePoint = Number(arguments[index])
+          if (
+            !isFinite(codePoint) || // `NaN`, `+Infinity`, or `-Infinity`
+            codePoint < 0 || // not a valid Unicode code point
+            codePoint > 0x10ffff || // not a valid Unicode code point
+            floor(codePoint) !== codePoint // not an integer
+          ) {
+            throw RangeError('Invalid code point: ' + codePoint)
+          }
+          if (codePoint <= 0xffff) {
+            // BMP code point
+            codeUnits.push(codePoint)
+          } else {
+            // Astral code point; split in surrogate halves
+            // http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+            codePoint -= 0x10000
+            highSurrogate = (codePoint >> 10) + 0xd800
+            lowSurrogate = (codePoint % 0x400) + 0xdc00
+            codeUnits.push(highSurrogate, lowSurrogate)
+          }
+          if (index + 1 === length || codeUnits.length > MAX_SIZE) {
+            result += stringFromCharCode.apply(null, codeUnits)
+            codeUnits.length = 0
+          }
+        }
+        return result
+      }
+      /* istanbul ignore next */
+      if (Object.defineProperty) {
+        Object.defineProperty(String, 'fromCodePoint', {
+          value: fromCodePoint,
+          configurable: true,
+          writable: true,
+        })
+      } else {
+        String.fromCodePoint = fromCodePoint
+      }
+    })()
+  }
+})(typeof exports === 'undefined' ? (this.sax = {}) : exports)
+
+const runs=new Map();
+const has=(p,n)=>p.has('MS:'+n);
+const value=(p,n)=>p.get('MS:'+n)?.value;
+function minutes(param){
+  const unit=param?.unitAccession||param?.unitName;
+  if(['UO:0000031','minute'].includes(unit))return 1;
+  if(['UO:0000010','second'].includes(unit))return 1/60;
+  if(['UO:0000032','hour'].includes(unit))return 60;
+  if(['UO:0000028','millisecond'].includes(unit))return 1/60000;
+  throw Error('Missing or unsupported retention-time unit.');
+}
+async function decode(a,n){
+  const p=a.params, precision=has(p,1000523)?8:has(p,1000521)?4:0;
+  if(!precision||[...p.values()].some(c=>/numpress/i.test(c.name))||(!has(p,1000574)&&!has(p,1000576)))throw Error('Unsupported mzML binary encoding. Export 32- or 64-bit floats with zlib or no compression.');
+  const raw=atob(a.binary.join('').replace(/\s/g,''));
+  let bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));
+  if(has(p,1000574)&&bytes.length){
+    bytes=new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer());
+  }
+  if(bytes.length!==n*precision)throw Error('Binary array length does not match the mzML header.');
+  return precision===8?new Float64Array(bytes.buffer):new Float32Array(bytes.buffer);
+}
+async function read(file){
+  const parser=sax.parser(true),groups=new Map(),channels=new Map(),native=new Map(),pending=[];
+  let item=null,arr=null,group=null,inBinary=false,count=0,ok=false;
+  parser.onopentag=tag=>{
+    const t=tag.name.split(':').pop(),a=tag.attributes;
+    if(t==='mzML')ok=true;
+    if(t==='referenceableParamGroup')group={id:a.id,p:new Map()};
+    if(t==='spectrum'||t==='chromatogram')item={type:t,id:a.id,n:Number(a.defaultArrayLength),p:new Map(),arrays:[]};
+    if(item&&t==='binaryDataArray')arr={params:new Map(),binary:[]};
+    const p=arr?.params||item?.p||group?.p;
+    if(p&&t==='cvParam'&&!p.has(a.accession))p.set(a.accession,a);
+    if(p&&t==='referenceableParamGroupRef')for(const [k,v] of groups.get(a.ref)||[])p.set(k,v);
+    if(arr&&t==='binary')inBinary=true;
+  };
+  parser.ontext=parser.oncdata=str=>{if(inBinary)arr.binary.push(str);};
+  parser.onclosetag=name=>{
+    const t=name.split(':').pop();
+    if(t==='referenceableParamGroup'){groups.set(group.id,group.p);group=null;}
+    if(t==='binary')inBinary=false;
+    if(t==='binaryDataArray'){item.arrays.push(arr);arr=null;}
+    if(t==='spectrum'||t==='chromatogram'){
+      if(t==='spectrum')count++;
+      if(item.arrays.some(a=>has(a.params,1000514)||has(a.params,1000595)))pending.push(item);
+      item=null;
+    }
+  };
+  async function ingest(s){
+    const lookup=n=>s.arrays.find(a=>has(a.params,n));
+    const intensity=lookup(1000515);if(!intensity)throw Error('Missing intensity array in '+s.id);
+    if(s.type==='chromatogram'){
+      const a=lookup(1000595);if(!a)return;
+      const scale=minutes(a.params.get('MS:1000595')),x=Float64Array.from(await decode(a,s.n),v=>v*scale),y=await decode(intensity,s.n);
+      native.set(s.id,{x,y});return;
+    }
+    const rt=s.p.get('MS:1000016');if(!rt)throw Error('Missing retention time in '+s.id);
+    const t=Number(rt.value)*minutes(rt),ms=Number(value(s.p,1000511)||1),pol=has(s.p,1000130)?' (+)':has(s.p,1000129)?' (−)':'';
+    const channel='MS'+ms+pol,x=await decode(lookup(1000514),s.n),y=await decode(intensity,s.n);
+    let tic=0,bpc=0;
+    for(let i=0;i<y.length;i++){tic+=y[i];if(y[i]>bpc)bpc=y[i];}
+    if(!channels.has(channel))channels.set(channel,[]);
+    channels.get(channel).push({t,x,y,tic:Number(value(s.p,1000285)??tic),bpc:Number(value(s.p,1000505)??bpc),profile:has(s.p,1000128)});
+  }
+  const reader=file.stream().pipeThrough(new TextDecoderStream()).getReader();
+  async function flush(){while(pending.length)await Promise.all(pending.splice(0,8).map(ingest));}
+  for(;;){const {done,value}=await reader.read();if(done)break;parser.write(value);await flush();}
+  parser.close();await flush();
+  if(!ok||!channels.size)throw Error('No retention-time mass spectra found in this mzML file.');
+  const meta={};
+  for(const [key,s] of channels){s.sort((a,b)=>a.t-b.t);let best=s[0];for(const scan of s)if(scan.tic>best.tic)best=scan;
+    meta[key]={n:s.length,lo:s[0].t,hi:s.at(-1).t,apex:best.t};}
+  return {channels,native,meta,count};
+}
+function compute(r,c){
+  const scans=r.channels.get(c.channel)||[];
+  let trace;
+  if(c.kind.startsWith('native:'))trace=r.native.get(c.kind.slice(7));
+  else{
+    trace={x:Float64Array.from(scans,s=>s.t),y:Float64Array.from(scans,s=>{
+      if(c.kind==='TIC')return s.tic;if(c.kind==='BPC')return s.bpc;
+      const tolerance=c.tol*c.target/1e6;let total=0;
+      for(let i=0;i<s.x.length;i++)if(Math.abs(s.x[i]-c.target)<=tolerance)total+=s.y[i];
+      return total;
+    })};
+  }
+  let chosen=scans.filter(s=>s.t>=c.start&&s.t<=c.end);
+  if(c.start===c.end&&scans.length&&c.start>=scans[0].t&&c.start<=scans.at(-1).t)
+    chosen=[scans.reduce((a,b)=>Math.abs(a.t-c.start)<=Math.abs(b.t-c.start)?a:b)];
+  let mass={x:[],y:[]};
+  if(chosen.length===1)mass={x:chosen[0].x,y:chosen[0].y,profile:chosen[0].profile};
+  if(chosen.length>1){
+    const bins=new Map();
+    for(const s of chosen)for(let i=0;i<s.x.length;i++){
+      const mz=s.x[i],v=s.y[i];if(!Number.isFinite(mz)||!Number.isFinite(v)||v===0)continue;
+      const key=Math.round(mz/c.bin),b=bins.get(key)||[0,0,0];b[0]+=v;b[1]+=mz*Math.abs(v);b[2]+=Math.abs(v);bins.set(key,b);
+    }
+    const peaks=[...bins.values()].sort((a,b)=>a[1]/a[2]-b[1]/b[2]);
+    mass={x:Float64Array.from(peaks,b=>b[1]/b[2]),y:Float64Array.from(peaks,b=>b[0]/chosen.length)};
+  }
+  return {trace:trace||{x:[],y:[]},mass,n:chosen.length,first:chosen[0]?.t,last:chosen.at(-1)?.t};
+}
+onmessage=async({data:{id,type,key,file,c}})=>{
+  try{let result;
+    if(type==='read'){const r=await read(file);runs.set(key,r);result={meta:r.meta,native:[...r.native.keys()],count:r.count};}
+    else if(type==='remove')runs.delete(key);
+    else result=compute(runs.get(key),c);
+    postMessage({id,result});
+  }catch(e){postMessage({id,error:e.message});}
+};
+</script>
+<script>(()=>{
+const get=id=>document.getElementById('lc'+id);
+const files=new Map(),requests=new Map(),charts={};
+const colors=['#2259af','#c45422','#218071','#8a448c','#927009','#3c7ca6'];
+let worker,seq=0,version=0,results=[],busy=false,drag=null,zoom=[null,null];
+function call(type,args){
+  if(!worker){
+    const u=URL.createObjectURL(new Blob([get('Worker').textContent],{type:'text/javascript'}));
+    worker=new Worker(u);URL.revokeObjectURL(u);
+    worker.onmessage=({data})=>{const job=requests.get(data.id);if(!job)return;requests.delete(data.id);data.error?job.reject(Error(data.error)):job.resolve(data.result);};
+    worker.onerror=e=>{for(const job of requests.values())job.reject(Error(e.message||'Reader failed.'));requests.clear();};
+  }
+  const id=++seq;return new Promise((resolve,reject)=>{requests.set(id,{resolve,reject});worker.postMessage({id,type,...args});});
+}
+function options(id,list){
+  const el=get(id),old=el.value;el.replaceChildren(...list.map(([v,n])=>new Option(n,v)));
+  if(list.some(a=>a[0]===old))el.value=old;
+}
+function controls(){
+  const all=[...files.values()];get('Controls').hidden=!all.length;get('Empty').hidden=!!all.length;
+  options('Channel',[...new Set(all.flatMap(d=>Object.keys(d.meta)))].sort().map(k=>[k,k]));
+  options('Kind',[['TIC','Total ion current'],['BPC','Base peak'],['XIC','Extracted ion (XIC)'],...[...new Set(all.flatMap(d=>d.native))].map(k=>['native:'+k,'Recorded · '+k])]);
+  get('Ion').hidden=get('Kind').value!=='XIC';get('Runs').replaceChildren();
+  all.forEach(d=>{
+    const row=element('div','lcRun'),check=document.createElement('input');check.type='checkbox';check.checked=d.visible;check.setAttribute('aria-label','Show '+d.name);check.onchange=()=>{d.visible=check.checked;update();};
+    const sw=element('span','lcSw');sw.style.background=d.color;
+    const name=element('b','',d.name),info=element('small','',Object.entries(d.meta).map(([k,v])=>k+' · '+v.n.toLocaleString()+' scans').join('  /  '));
+    const del=element('button','small','Remove');del.onclick=()=>{files.delete(d.key);call('remove',{key:d.key}).catch(fail);controls();update();};row.append(check,sw,name,info,del);get('Runs').append(row);
+  });
+}
+function fail(e){get('Error').textContent=e.message||String(e);}
+async function load(list){
+  if(busy)return;busy=true;get('Import').disabled=true;const errors=[];
+  for(const file of list){
+    get('Status').textContent='Reading '+file.name+'…';
+    try{
+      const key=++seq,d=await call('read',{key,file}),first=!files.size;
+      let name=file.name,i=2;while([...files.values()].some(f=>f.name===name)){name=file.name+' ('+i+')';i++;}
+      files.set(key,{...d,key,name,visible:true,color:colors[files.size%colors.length]});controls();
+      if(first){const m=d.meta[get('Channel').value];get('Start').value=get('End').value=m.apex;}
+    }catch(e){errors.push(file.name+' — '+e.message);}
+  }
+  busy=false;get('Import').disabled=false;get('Files').value='';await update();if(errors.length)get('Error').textContent=errors.join('\n');
+}
+window.lcImportFiles=load;get('Import').onclick=()=>get('Files').click();get('Files').onchange=e=>load([...e.target.files]);
+function numeric(id){const el=get(id);if(el.value===''||!Number.isFinite(el.valueAsNumber))throw Error('Enter a number for '+el.parentElement.firstChild.textContent+'.');return el.valueAsNumber;}
+async function update(){
+  const token=++version;get('Error').textContent='';get('Ion').hidden=get('Kind').value!=='XIC';
+  try{
+    if(!files.size){results=[];get('Status').textContent='';return;}
+    const c={channel:get('Channel').value,kind:get('Kind').value,start:numeric('Start'),end:numeric('End'),bin:numeric('Bin')};
+    if(c.start>c.end||c.bin<=0)throw Error('Use start ≤ end and a positive bin width.');
+    if(c.kind==='XIC'){c.target=numeric('Target');c.tol=numeric('Tol');if(c.target<=0||c.tol<=0)throw Error('Enter a positive target m/z and ppm tolerance.');}
+    get('Status').textContent='Updating plots…';
+    const next=await Promise.all([...files.values()].filter(f=>f.visible).map(async f=>({...f,...await call('plot',{key:f.key,c})})));
+    if(version!==token)return;results=next;get('Status').textContent=next.length?'':'Select a run to display.';
+    get('Summary').textContent=next.map(r=>r.name+' · '+(r.n===0?'no matching scans':r.n===1?'scan at '+r.first.toFixed(4)+' min':r.n+' scans, '+r.first.toFixed(4)+'–'+r.last.toFixed(4)+' min')).join('   |   ');drawAll();
+  }catch(e){if(token===version){fail(e);get('Status').textContent='';}}
+}
+function applyZoom(){
+  try{
+    const lo=get('Low').value?numeric('Low'):null,hi=get('High').value?numeric('High'):null;
+    if(lo!==null&&hi!==null&&lo>=hi)throw Error('Maximum m/z must exceed minimum m/z.');
+    zoom=[lo,hi];get('Error').textContent='';drawAll();
+  }catch(e){fail(e);}
+}
+function resetZoom(){get('Low').value=get('High').value='';zoom=[null,null];drawAll();}
+get('Apply').onclick=update;get('Zoom').onclick=applyZoom;get('Reset').onclick=resetZoom;
+get('All').onclick=()=>{
+  const ms=[...files.values()].filter(f=>f.visible).map(f=>f.meta[get('Channel').value]).filter(Boolean);
+  if(ms.length){get('Start').value=Math.min(...ms.map(m=>m.lo));get('End').value=Math.max(...ms.map(m=>m.hi));update();}
+};
+['Kind','Channel','Target','Tol','Bin'].forEach(k=>get(k).onchange=update);
+['Mode','Scale'].forEach(k=>get(k).onchange=()=>drawAll());
+for(const k of ['Start','End','Low','High'])get(k).onkeydown=e=>{if(e.key==='Enter')(k==='Start'||k==='End'?update:applyZoom)();};
+function drawAll(){if(get('Controls').hidden||document.getElementById('lcms').hidden)return;chart('Trace');chart('Mass');if(get('Peaks').open)peakTable();}
+const fmt=v=>v!==0&&(Math.abs(v)>=1e5||Math.abs(v)<.001)?v.toExponential(1):Number(v.toPrecision(5)).toString();
+function chart(id){
+  const cv=get(id),w=cv.clientWidth;if(w<30)return;
+  const mass=id==='Mass',stacked=get('Mode').value==='Stacked',relative=get('Scale').value==='relative';
+  const lanes=stacked?Math.max(results.length,1):1,laneH=stacked?140:190,h=laneH*lanes+48;
+  cv.style.height=h+'px';const ratio=Math.min(devicePixelRatio||1,2);cv.width=Math.round(w*ratio);cv.height=Math.round(h*ratio);
+  const ctx=cv.getContext('2d');ctx.scale(ratio,ratio);ctx.font='11px system-ui';ctx.lineWidth=1.2;
+  const l=65,right=w-14,sets=results.map(r=>({...r,p:mass?r.mass:r.trace}));
+  let min=Infinity,max=-Infinity;
+  for(const {p} of sets)for(const x of p.x){if(x<min)min=x;if(x>max)max=x;}
+  if(!isFinite(min)){min=0;max=1;}
+  if(mass){min=zoom[0]??min;max=zoom[1]??max;}
+  if(max<=min){if(mass&&zoom[1]!==null)min=max-1;else max=min+1;}
+  const px=x=>l+(x-min)/(max-min)*(right-l);
+  for(const d of sets){
+    let scale=0;for(const v of d.p.y)if(Math.abs(v)>scale)scale=Math.abs(v);
+    d.factor=relative?100/(scale||1):1;
+    d.mx=0;d.mn=0;for(let i=0;i<d.p.x.length;i++){if(d.p.x[i]<min||d.p.x[i]>max)continue;const v=d.p.y[i]*d.factor;d.mx=Math.max(d.mx,v);d.mn=Math.min(d.mn,v);}
+  }
+  for(let lane=0;lane<lanes;lane++){
+    const items=stacked?sets.slice(lane,lane+1):sets,top=lane*laneH+20,bottom=(lane+1)*laneH;
+    const ymax=Math.max(...items.map(d=>d.mx),0)||1,ymin=Math.min(...items.map(d=>d.mn),0),py=v=>bottom-(v-ymin)/(ymax-ymin)*(bottom-top);
+    ctx.textAlign='right';ctx.fillStyle='#566471';ctx.strokeStyle='#dbe0e6';
+    for(let j=0;j<=2;j++){const v=ymin+(ymax-ymin)*j/2,y=py(v);ctx.beginPath();ctx.moveTo(l,y);ctx.lineTo(right,y);ctx.stroke();ctx.fillText(fmt(v),l-7,y+4);}
+    ctx.textAlign='left';ctx.fillStyle=stacked&&items.length?items[0].color:'#53616f';ctx.fillText((stacked&&items[0]?items[0].name+' · ':'')+(relative?'Relative intensity (%)':'Intensity'),l,top-6);
+    ctx.save();ctx.beginPath();ctx.rect(l,top,right-l,bottom-top);ctx.clip();
+    if(!mass){
+      const a=drag?.id===id?drag.start:Number(get('Start').value),b=drag?.id===id?drag.now:Number(get('End').value);
+      ctx.fillStyle='#376bc424';ctx.fillRect(px(Math.min(a,b)),top,Math.max(2,Math.abs(px(b)-px(a))),bottom-top);
+    }
+    for(const d of items){
+      const {x,y}=d.p,sticks=mass&&!d.p.profile;ctx.strokeStyle=d.color;ctx.beginPath();let started=false;
+      for(let i=0;i<x.length;i++){
+        if(x[i]<min||x[i]>max)continue;const xx=px(x[i]),yy=py(y[i]*d.factor);
+        if(sticks){ctx.moveTo(xx,py(0));ctx.lineTo(xx,yy);}else{if(!started)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);started=true;}
+      }ctx.stroke();
+    }
+    if(mass&&drag?.id===id){ctx.fillStyle='#376bc424';ctx.fillRect(px(Math.min(drag.start,drag.now)),top,Math.abs(px(drag.now)-px(drag.start)),bottom-top);}
+    ctx.restore();
+  }
+  ctx.fillStyle='#364553';ctx.textAlign='center';const ticks=Math.max(2,Math.min(7,Math.floor((right-l)/75)));
+  for(let j=0;j<=ticks;j++){const x=min+(max-min)*j/ticks;ctx.textAlign=j===ticks?'right':j===0?'left':'center';ctx.fillText(fmt(x),px(x),h-28);}
+  ctx.textAlign='center';ctx.font='13px system-ui';ctx.fillText(mass?'m/z':'Retention time (min)',(l+right)/2,h-7);
+  charts[id]={min,max,l,right,laneH,sets,stacked};
+}
+for(const id of ['Trace','Mass']){
+  const cv=get(id);
+  function pos(e){const g=charts[id],box=cv.getBoundingClientRect(),x=Math.min(g.right,Math.max(g.l,e.clientX-box.left));return g.min+(x-g.l)/(g.right-g.l)*(g.max-g.min);}
+  cv.onpointerdown=e=>{if(!charts[id]||!results.length||e.button!==0)return;const start=pos(e);drag={id,start,now:start,client:e.clientX};cv.setPointerCapture(e.pointerId);};
+  cv.onpointermove=e=>{
+    const g=charts[id];if(!g)return;const x=pos(e);
+    if(drag?.id===id){drag.now=x;chart(id);return;}
+    const lane=Math.floor((e.clientY-cv.getBoundingClientRect().top)/g.laneH);
+    const items=g.stacked?g.sets.slice(lane,lane+1):g.sets;
+    const hits=items.map(d=>{
+      const p=d.p;let lo=0,hi=p.x.length;while(lo<hi){const m=(lo+hi)>>1;if(p.x[m]<x)lo=m+1;else hi=m;}
+      const i=lo===0?0:lo>=p.x.length||x-p.x[lo-1]<p.x[lo]-x?lo-1:lo;
+      if(!p.x.length)return '';
+      return d.name+' · '+(id==='Mass'?'m/z ':'')+p.x[i].toFixed(id==='Mass'?5:4)+(id==='Trace'?' min':'')+' · '+fmt(p.y[i]);
+    });
+    get(id+'Read').textContent=hits.filter(Boolean).join('   |   ');
+  };
+  cv.onpointerup=e=>{
+    if(drag?.id!==id)return;const start=drag.start,end=pos(e),click=Math.abs(e.clientX-drag.client)<5;drag=null;
+    if(id==='Trace'){get('Start').value=click?end:Math.min(start,end);get('End').value=click?end:Math.max(start,end);update();}
+    else if(!click){get('Low').value=Math.min(start,end);get('High').value=Math.max(start,end);applyZoom();}
+  };
+  cv.onpointercancel=()=>{drag=null;drawAll();};cv.onpointerleave=()=>{get(id+'Read').textContent='';};
+}
+function peakTable(){
+  const box=get('PeakRows');box.replaceChildren();
+  for(const run of results){
+    const {x,y,profile}=run.mass,top=[];
+    for(let i=0;i<x.length;i++){
+      if((zoom[0]!==null&&x[i]<zoom[0])||(zoom[1]!==null&&x[i]>zoom[1])||y[i]<=0)continue;
+      if(profile&&(y[i]<y[i-1]||y[i]<y[i+1]))continue;
+      if(top.length===10&&y[i]<=y[top[9]])continue;
+      top.push(i);top.sort((a,b)=>y[b]-y[a]);if(top.length>10)top.pop();
+    }
+    box.append(element('h3','',run.name));
+    if(!top.length){box.append(element('small','','No peaks in range.'));continue;}
+    const table=document.createElement('table'),header=table.createTHead().insertRow();
+    for(const name of ['m/z','Intensity','Chromatogram'])header.append(element('th','',name));
+    const body=table.createTBody();
+    for(const i of top){
+      const row=body.insertRow();row.insertCell().textContent=x[i].toFixed(5);row.insertCell().textContent=fmt(y[i]);
+      const b=element('button','small','Extract ion');b.onclick=()=>{get('Target').value=x[i].toFixed(7);get('Kind').value='XIC';update();};row.insertCell().append(b);
+    }
+    box.append(table);
+  }
+}
+get('Peaks').ontoggle=()=>{if(get('Peaks').open)peakTable();};
+get('Mass').ondblclick=resetZoom;
+window.addEventListener('resize',drawAll);window.addEventListener('hashchange',()=>requestAnimationFrame(drawAll));
 })();
 </script></body></html>
