@@ -15,7 +15,9 @@ body{background:#f4f5f5;color:var(--ink);font:15px/1.5 Inter,Arial,sans-serif;ma
 #lcms .card{margin-bottom:14px}#lcms canvas{display:block;width:100%;touch-action:none;cursor:crosshair}#lcms .lcInline,.lcFilters,.lcRun{display:flex;align-items:end;flex-wrap:wrap;gap:10px}.lcFilters>label,.lcInline label{min-width:110px;flex:1}.lcFilters>div{flex-basis:100%}.lcFilters label{font-size:12px}.lcRun{align-items:center;border-top:1px solid var(--line);padding:9px 0}.lcRun input{height:16px;width:16px}.lcRun b{overflow-wrap:anywhere;font-size:13px}.lcRun small{flex:1}.lcSw{width:13px;height:4px;border-radius:2px}.lcRun small,.lcChart small,#lcSummary,.lcHint,#lcms output{font-size:12px;color:var(--sub)}#lcms output{display:block;min-height:24px;margin:5px 0}.lcChart .sectionhead{align-items:baseline;flex-wrap:wrap}.lcChart .lcInline{border-top:1px solid var(--line);padding-top:12px}#lcSummary{margin:8px 0;overflow-wrap:anywhere}#lcError{color:#942b21;white-space:pre-line}#lcStatus:empty,#lcError:empty{display:none}.bar nav{overflow-x:auto;white-space:nowrap;min-width:0}@media(max-width:620px){.bar{gap:14px}.bar nav{gap:14px}.bar nav a{font-size:12px}}
 
 #lcPeaks{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}#lcPeakRows h3{font-size:14px}#lcPeakRows table{border-collapse:collapse;width:100%;max-width:600px;font-size:13px;font-variant-numeric:tabular-nums}#lcPeakRows td,#lcPeakRows th{text-align:left;padding:4px 10px;border-bottom:1px solid var(--line)}
-</style></head>
+
+#lcFinder fieldset{border:1px solid var(--line);border-radius:5px;padding:8px 12px;margin:10px 0;font-size:13px}
+#lcAds{display:flex;gap:12px;flex-wrap:wrap}#lcAds label,#lcFinder .findCheck{display:flex;flex-direction:row;gap:5px;align-items:center}#lcFinder input[type=checkbox]{width:16px;height:16px}.findControls{padding:9px 0}.findTable{overflow-x:auto;max-height:385px}.findTable table{border-collapse:collapse;font-size:12px;width:100%;font-variant-numeric:tabular-nums}.findTable th,.findTable td{padding:6px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}.findTable th{position:sticky;top:0;background:#f3f6f9}#lcFindPages{padding-top:10px}</style></head>
 <body>
 <header class="bar"><div class="mark" aria-hidden="true">N<span>T</span></div><nav aria-label="Workspace"><a href="#photos">Photos</a><a href="#analysis">EC-Lab analysis</a><a href="#lcms">LC-MS</a><a href="#sessions">Saved sessions</a></nav></header>
 <main id="photos" class="page">
@@ -45,6 +47,22 @@ body{background:#f4f5f5;color:var(--ink);font:15px/1.5 Inter,Arial,sans-serif;ma
 <label>Mass channel<select id="lcChannel"></select></label><label>Chromatogram<select id="lcKind"></select></label>
 <label>Comparison<select id="lcMode"><option>Overlay</option><option>Stacked</option></select></label><label>Intensity<select id="lcScale"><option value="raw">Absolute</option><option value="relative">Relative (% of run maximum)</option></select></label>
 <div id="lcIon" class="lcInline" hidden><label>Target m/z<input type="number" step="any" id="lcTarget" value="167.0147"></label><label>Tolerance (± ppm)<input type="number" step="any" id="lcTol" value="10"></label></div></div>
+<section class="card" id="lcFinder"><h2>Component finder</h2>
+<div class="lcFilters findControls">
+<label>Search<select id="lcFindMode"><option value="target">Expected neutral mass</option><option value="pairs">Co-occurring adduct pairs</option><option value="ions">Observed sample ions</option></select></label>
+<label>MS1 channel<select id="lcFindChannel"></select></label>
+<label id="lcMassField">Neutral exact mass (Da)<input id="lcNeutral" type="number" step="any" placeholder="Monoisotopic mass"></label>
+<label>Mass tolerance (±)<input id="lcFindTol" type="number" step="any" value="10"></label>
+<label>Tolerance unit<select id="lcFindUnit"><option>ppm</option><option>Da</option></select></label>
+<label>Minimum intensity<input id="lcFloor" type="number" step="any" value="0"></label></div>
+<fieldset id="lcAdFields"><legend>Adducts</legend><div id="lcAds"></div></fieldset>
+<div class="lcFilters findControls"><label>Blank reference<select id="lcBlank"></select></label>
+<label id="lcBlankField">Compare against<select id="lcBlankType"><option value="run">Entire blank run</option><option value="scan">One blank scan</option></select></label>
+<label id="lcBlankTimeField">Blank scan near (min)<input type="number" step="any" id="lcBlankTime" value="0"></label>
+<label class="findCheck" id="lcOnlyField"><input type="checkbox" id="lcOnly" checked>Sample-only ions</label></div>
+<p class="lcHint" id="lcFindHelp"></p><button id="lcFind" class="primary">Search scans</button>
+<p id="lcFindStatus" role="status"></p><div id="lcFindRows" class="findTable"></div>
+<div id="lcFindPages" hidden><button id="lcFindPrev">Previous</button> <span id="lcFindPage"></span> <button id="lcFindNext">Next</button></div></section>
 <section class="card lcChart"><div class="sectionhead"><h2>Chromatogram</h2><small>Click for one scan · Drag for an elution window</small></div><canvas id="lcTrace" aria-label="Intensity versus retention time"></canvas><output id="lcTraceRead"></output>
 <div class="lcInline"><label>Start (min)<input id="lcStart" type="number" step="any"></label><label>End (min)<input id="lcEnd" type="number" step="any"></label><button id="lcApply">Apply window</button><button id="lcAll">Full run</button></div></section>
 <section class="card lcChart"><div class="sectionhead"><h2>Mass spectrum</h2><small>Drag to zoom · Double-click to reset</small></div><div id="lcSummary"></div><canvas id="lcMass" aria-label="Intensity versus mass-to-charge ratio"></canvas><output id="lcMassRead"></output>
@@ -2596,10 +2614,98 @@ function compute(r,c){
   }
   return {trace:trace||{x:[],y:[]},mass,n:chosen.length,first:chosen[0]?.t,last:chosen.at(-1)?.t};
 }
+// Search native, unbinned MS1 peaks. Each adduct below has charge magnitude one.
+function lowerMass(values,mass){
+  let a=0,b=values.length;
+  while(a<b){const mid=(a+b)>>>1;if(values[mid]<mass)a=mid+1;else b=mid;}
+  return a;
+}
+function findComponents(c){
+  const delta=m=>c.unit==='ppm'?m*c.tol/1e6:c.tol;
+  function peak(s,i){
+    return s.y[i]>0&&s.y[i]>=c.floor&&Number.isFinite(s.x[i])&&(!s.profile||
+      ((i===0||s.y[i]>=s.y[i-1])&&(i===s.y.length-1||s.y[i]>s.y[i+1])));
+  }
+  let blank=[],excluded,blankRT=null;
+  if(c.blank){
+    const scans=runs.get(c.blank)?.channels.get(c.channel);
+    if(!scans?.length)throw Error('Blank has no scans in the selected MS1 channel.');
+    let selected=scans;
+    if(c.single){
+      if(c.rt<scans[0].t||c.rt>scans.at(-1).t)throw Error('Blank time is outside the run.');
+      excluded=scans.reduce((a,b)=>Math.abs(a.t-c.rt)<=Math.abs(b.t-c.rt)?a:b);
+      selected=[excluded];blankRT=excluded.t;
+    }
+    const unique=new Set();
+    for(const s of selected)for(let i=0;i<s.x.length;i++)if(peak(s,i))unique.add(s.x[i]);
+    blank=Float64Array.from(unique).sort();
+  }
+  function inBlank(m){const d=delta(m),j=lowerMass(blank,m-d);return j<blank.length&&blank[j]<=m+d;}
+  const rows=[];let scansSearched=0;
+  for(const key of c.keys){
+    if(key===c.blank&&!c.single)continue;
+    const scans=runs.get(key)?.channels.get(c.channel)||[];
+    // Index measured masses by tolerance-sized buckets. Verify each candidate against its fixed reference.
+    const buckets=new Map(),features=[],pairs=new Map();
+    function feature(m){
+      const idx=c.unit==='ppm'?Math.floor(Math.log(m)/Math.log1p(c.tol/1e6)):Math.floor(m/c.tol);
+      let nearest=null;
+      for(const offset of [-2,-1,0,1,2])for(const f of buckets.get(idx+offset)||[]){
+        if(Math.abs(m-f.ref)<=delta(f.ref)&&(!nearest||Math.abs(m-f.ref)<Math.abs(m-nearest.ref)))nearest=f;
+      }
+      if(nearest)return nearest;
+      const f={id:features.length,ref:m,key,n:0,apex:0,last:-1};features.push(f);
+      if(!buckets.has(idx))buckets.set(idx,[]);buckets.get(idx).push(f);return f;
+    }
+    for(let sn=0;sn<scans.length;sn++){
+      const s=scans[sn];if(s===excluded)continue;scansSearched++;
+      if(c.mode==='target'){
+        for(const ad of c.ads){
+          const theory=c.mass+ad.shift,d=delta(theory);
+          if(theory<=0)continue;
+          for(let i=lowerMass(s.x,theory-d);i<s.x.length&&s.x[i]<=theory+d;i++){
+            if(!peak(s,i))continue;
+            const mz=s.x[i],bg=inBlank(mz);
+            if(c.only&&bg)continue;
+            rows.push({key,ad:ad.name,theory,mz,ppm:(mz-theory)/theory*1e6,t:s.t,sn:sn+1,apex:s.y[i],bg});
+          }
+        }continue;
+      }
+      const members=new Map();
+      for(let i=0;i<s.x.length;i++){
+        if(!peak(s,i)||s.x[i]<=0)continue;
+        const mz=s.x[i],bg=inBlank(mz);if(c.only&&bg)continue;
+        const f=feature(mz);if(f.last!==sn){f.last=sn;f.n++;}
+        if(s.y[i]>f.apex)Object.assign(f,{mz,apex:s.y[i],t:s.t,bg});
+        members.set(i,f);
+      }
+      if(c.mode!=='pairs')continue;
+      for(const [i,f] of members)for(let a=0;a<c.ads.length;a++)for(let b=a+1;b<c.ads.length;b++){
+        const ad=c.ads[a],other=c.ads[b],neutral=s.x[i]-ad.shift;
+        if(neutral<=0||ad.pol!==other.pol)continue;
+        const expected=neutral+other.shift,d=delta(expected);
+        for(let j=lowerMass(s.x,expected-d);j<s.x.length&&s.x[j]<=expected+d;j++){
+          const g=members.get(j);if(!g||g===f)continue;
+          const id=[f.id,g.id,a,b].join('/');let r=pairs.get(id);
+          if(!r){r={key,ad:ad.name,other:other.name,n:0,apex:0,last:-1};pairs.set(id,r);}
+          if(r.last!==sn){r.n++;r.last=sn;}
+          const strength=Math.min(s.y[i],s.y[j]);
+          if(strength>r.apex)Object.assign(r,{mz:s.x[i],mz2:s.x[j],neutral:(neutral+s.x[j]-other.shift)/2,t:s.t,ppm:(s.x[j]-expected)/expected*1e6,apex:strength,bg:inBlank(s.x[i])||inBlank(s.x[j])});
+        }
+      }
+    }
+    if(c.mode==='ions')for(const f of features)rows.push(f);
+    if(c.mode==='pairs')for(const r of pairs.values())rows.push(r);
+  }
+  rows.sort((a,b)=>b.apex-a.apex);
+  return {rows,scansSearched,blankRT};
+}
+
 onmessage=async({data:{id,type,key,file,c}})=>{
   try{let result;
     if(type==='read'){const r=await read(file);runs.set(key,r);result={meta:r.meta,native:[...r.native.keys()],count:r.count};}
     else if(type==='remove')runs.delete(key);
+    else if(type==='find')result=findComponents(c);
     else result=compute(runs.get(key),c);
     postMessage({id,result});
   }catch(e){postMessage({id,error:e.message});}
@@ -2627,9 +2733,9 @@ function controls(){
   const all=[...files.values()];get('Controls').hidden=!all.length;get('Empty').hidden=!!all.length;
   options('Channel',[...new Set(all.flatMap(d=>Object.keys(d.meta)))].sort().map(k=>[k,k]));
   options('Kind',[['TIC','Total ion current'],['BPC','Base peak'],['XIC','Extracted ion (XIC)'],...[...new Set(all.flatMap(d=>d.native))].map(k=>['native:'+k,'Recorded · '+k])]);
-  get('Ion').hidden=get('Kind').value!=='XIC';get('Runs').replaceChildren();
+  get('Ion').hidden=get('Kind').value!=='XIC';get('Runs').replaceChildren();finderFields(true);
   all.forEach(d=>{
-    const row=element('div','lcRun'),check=document.createElement('input');check.type='checkbox';check.checked=d.visible;check.setAttribute('aria-label','Show '+d.name);check.onchange=()=>{d.visible=check.checked;update();};
+    const row=element('div','lcRun'),check=document.createElement('input');check.type='checkbox';check.checked=d.visible;check.setAttribute('aria-label','Show '+d.name);check.onchange=()=>{d.visible=check.checked;finderFields();update();};
     const sw=element('span','lcSw');sw.style.background=d.color;
     const name=element('b','',d.name),info=element('small','',Object.entries(d.meta).map(([k,v])=>k+' · '+v.n.toLocaleString()+' scans').join('  /  '));
     const del=element('button','small','Remove');del.onclick=()=>{files.delete(d.key);call('remove',{key:d.key}).catch(fail);controls();update();};row.append(check,sw,name,info,del);get('Runs').append(row);
@@ -2773,6 +2879,67 @@ function peakTable(){
   }
 }
 get('Peaks').ontoggle=()=>{if(get('Peaks').open)peakTable();};
+const adductList=[
+  ['[M+H]+',1.00727647,1],['[M+Na]+',22.9892207,1],['[M+Li]+',7.0154549,1],['[M+NH4]+',18.0338256,1],['[M+K]+',38.9631579,1],
+  ['[M−H]−',-1.00727647,-1],['[M+Cl]−',34.9694013,-1],['[M+HCOO]−',44.9982028,-1]
+];
+let findGeneration=0,findRows=[],findPage=0,findConfig=null;
+function clearFind(){
+  findGeneration++;findRows=[];findConfig=null;get('FindRows').replaceChildren();get('FindPages').hidden=true;get('FindStatus').textContent='';get('Find').disabled=false;
+}
+function finderFields(rebuild=false){
+  clearFind();
+  if(rebuild){
+    const channels=[...new Set([...files.values()].flatMap(d=>Object.keys(d.meta)))].filter(k=>/^MS1(?: |$)/.test(k)).sort();
+    options('FindChannel',channels.map(k=>[k,k]));
+    options('Blank',[['','None'],...[...files.values()].map(d=>[String(d.key),d.name])]);
+  }
+  const mode=get('FindMode').value,channel=get('FindChannel').value,blank=!!get('Blank').value;
+  const sign=channel.includes('−')?-1:channel.includes('+')?1:0,ads=get('Ads');
+  if(ads.dataset.sign!==String(sign)){
+    ads.replaceChildren();ads.dataset.sign=sign;
+    for(const [name,shift,pol] of adductList){
+      if(sign&&pol!==sign)continue;const l=document.createElement('label'),b=document.createElement('input');b.type='checkbox';b.value=name;
+      b.checked=(pol===sign||!sign)&&['[M+H]+','[M+Na]+','[M−H]−','[M+Cl]−'].includes(name);l.append(b,name);ads.append(l);
+    }
+  }
+  get('Find').disabled=!channel;get('MassField').hidden=mode!=='target';get('AdFields').hidden=mode==='ions';get('BlankField').hidden=get('OnlyField').hidden=!blank;get('BlankTimeField').hidden=!blank||get('BlankType').value!=='scan';
+  get('FindHelp').textContent=(mode==='target'?'Search every MS1 scan for each selected adduct.':mode==='pairs'?'Candidate pairs must occur in the same scan and agree on neutral mass within tolerance. Ranked by the weaker ion at the strongest shared scan.':'Group observed m/z values across scans within tolerance and report the strongest observation.')+(blank?' Blank matching uses m/z across the chosen reference, with the same intensity threshold.':'');
+}
+get('Finder').addEventListener('input',()=>finderFields());
+function renderFind(){
+  const c=findConfig,box=get('FindRows');box.replaceChildren();if(!c||!findRows.length)return;
+  const table=document.createElement('table'),head=table.createTHead().insertRow(),body=table.createTBody();
+  const hdr=c.mode==='target'?['Adduct','Expected m/z','Observed m/z','Δ ppm','MS1 scan #','RT (min)','Intensity']:c.mode==='pairs'?['Adduct pair','Observed m/z pair','Neutral mass (Da)','Δ ppm','Shared scans','RT (min)','Weaker ion intensity']:['Observed m/z','Scans','Apex RT (min)','Apex intensity'];
+  for(const h of ['Sample',...hdr,...(c.blank?['Blank match']:[]),'Spectrum'])head.append(element('th','',h));
+  for(const r of findRows.slice(findPage*40,(findPage+1)*40)){
+    const m=n=>n.toFixed(5),t=r.t.toFixed(4),i=fmt(r.apex);
+    const cells=c.mode==='target'?[r.ad,m(r.theory),m(r.mz),r.ppm.toFixed(2),r.sn,t,i]:c.mode==='pairs'?[r.ad+' / '+r.other,m(r.mz)+' / '+m(r.mz2),m(r.neutral),r.ppm.toFixed(2),r.n,t,i]:[m(r.mz),r.n,t,i];
+    const row=body.insertRow();for(const v of [files.get(r.key)?.name,...cells,...(c.blank?[r.bg?'Present':'Undetected']:[])])row.insertCell().textContent=v;
+    const open=element('button','small','View scan');open.onclick=()=>{get('Channel').value=c.channel;get('Start').value=get('End').value=r.t;get('Low').value=get('High').value='';zoom=[null,null];get('Kind').value='TIC';update();get('Mass').scrollIntoView({block:'center'});};row.insertCell().append(open);
+  }
+  box.append(table);const pages=Math.ceil(findRows.length/40);get('FindPages').hidden=pages<=1;get('FindPage').textContent=(findPage+1)+' / '+pages;get('FindPrev').disabled=findPage===0;get('FindNext').disabled=findPage+1===pages;
+}
+get('FindPrev').onclick=()=>{findPage--;renderFind();};get('FindNext').onclick=()=>{findPage++;renderFind();};
+get('Find').onclick=async()=>{
+  clearFind();const token=findGeneration;
+  try{
+    const mode=get('FindMode').value,blank=Number(get('Blank').value),single=get('BlankType').value==='scan',channel=get('FindChannel').value;
+    const keys=[...files.values()].filter(d=>d.visible&&d.meta[channel]&&(single||d.key!==blank)).map(d=>d.key);
+    if(!keys.length)throw Error('Select a visible sample with the chosen MS1 channel.');
+    const names=[...get('Ads').querySelectorAll('input:checked')].map(b=>b.value);
+    const ads=adductList.filter(a=>names.includes(a[0])).map(([name,shift,pol])=>({name,shift,pol}));
+    if(mode==='target'&&!ads.length||mode==='pairs'&&ads.length<2)throw Error('Select '+(mode==='pairs'?'at least two adducts.':'at least one adduct.'));
+    const c={mode,keys,channel,blank,single,rt:blank&&single?numeric('BlankTime'):0,only:!!blank&&get('Only').checked,mass:mode==='target'?numeric('Neutral'):0,ads,tol:numeric('FindTol'),unit:get('FindUnit').value,floor:numeric('Floor')};
+    if(c.tol<=0||c.floor<0||mode==='target'&&c.mass<=0)throw Error('Enter a positive mass and tolerance, and a nonnegative intensity threshold.');
+    get('FindStatus').textContent='Searching MS1 scans…';get('Find').disabled=true;
+    const result=await call('find',{c});if(token!==findGeneration)return;
+    findConfig=c;findRows=result.rows;findPage=0;renderFind();
+    get('FindStatus').textContent=findRows.length.toLocaleString()+' '+({target:'peak matches',pairs:'candidate pairs',ions:'observed ions'}[mode])+' across '+result.scansSearched.toLocaleString()+' sample scans.'+(result.blankRT===null?'':' Blank scan at '+result.blankRT.toFixed(4)+' min.');
+  }catch(e){if(token===findGeneration)get('FindStatus').textContent=e.message;}
+  finally{if(token===findGeneration)get('Find').disabled=false;}
+};
+
 get('Mass').ondblclick=resetZoom;
 window.addEventListener('resize',drawAll);window.addEventListener('hashchange',()=>requestAnimationFrame(drawAll));
 })();
