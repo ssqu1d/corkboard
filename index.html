@@ -17,7 +17,7 @@ body{background:#f4f5f5;color:var(--ink);font:15px/1.5 Inter,Arial,sans-serif;ma
 #lcPeaks{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}#lcPeakRows h3{font-size:14px}#lcPeakRows table{border-collapse:collapse;width:100%;max-width:600px;font-size:13px;font-variant-numeric:tabular-nums}#lcPeakRows td,#lcPeakRows th{text-align:left;padding:4px 10px;border-bottom:1px solid var(--line)}
 
 #lcFinder fieldset{border:1px solid var(--line);border-radius:5px;padding:8px 12px;margin:10px 0;font-size:13px}
-#lcAds{display:flex;gap:12px;flex-wrap:wrap}#lcAds label,#lcFinder .findCheck{display:flex;flex-direction:row;gap:5px;align-items:center}#lcFinder input[type=checkbox]{width:16px;height:16px}.findControls{padding:9px 0}.findTable{overflow-x:auto;max-height:385px}.findTable table{border-collapse:collapse;font-size:12px;width:100%;font-variant-numeric:tabular-nums}.findTable th,.findTable td{padding:6px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}.findTable th{position:sticky;top:0;background:#f3f6f9}#lcFindPages{padding-top:10px}</style></head>
+#lcAds{display:flex;gap:12px;flex-wrap:wrap}#lcAds label,#lcFinder .findCheck{display:flex;flex-direction:row;gap:5px;align-items:center}#lcFinder input[type=checkbox]{width:16px;height:16px}.findControls{padding:9px 0}.findTable{overflow-x:auto;max-height:385px}.findTable table{border-collapse:collapse;font-size:12px;width:100%;font-variant-numeric:tabular-nums}.findTable th,.findTable td{padding:6px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}.findTable th{position:sticky;top:0;background:#f3f6f9}#lcFindPages{padding-top:10px}.formulaPanel{border-top:1px solid var(--line);margin-top:16px;padding-top:12px}.formulaPanel fieldset{border:1px solid var(--line);margin:12px 0;padding:10px}.formulaPanel legend{font-size:13px}.formulaChoices,.formulaAtoms{display:flex;gap:12px;flex-wrap:wrap}.formulaChoices label,.formulaAtoms .atomName{display:flex;align-items:center;gap:4px}.formulaPanel input[type=checkbox]{width:15px;height:15px}.atomGroup{display:grid;grid-template-columns:repeat(2,60px);gap:5px}.atomName{grid-column:span 2;font-weight:650}.formulaPanel .findTable{margin:10px 0}.formulaPanel #lcFormulaStatus{font-size:13px}</style></head>
 <body>
 <header class="bar"><div class="mark" aria-hidden="true">N<span>T</span></div><nav aria-label="Workspace"><a href="#photos">Photos</a><a href="#analysis">EC-Lab analysis</a><a href="#lcms">LC-MS</a><a href="#sessions">Saved sessions</a></nav></header>
 <main id="photos" class="page">
@@ -66,7 +66,23 @@ body{background:#f4f5f5;color:var(--ink);font:15px/1.5 Inter,Arial,sans-serif;ma
 <section class="card lcChart"><div class="sectionhead"><h2>Chromatogram</h2><small>Click for one scan · Drag for an elution window</small></div><canvas id="lcTrace" aria-label="Intensity versus retention time"></canvas><output id="lcTraceRead"></output>
 <div class="lcInline"><label>Start (min)<input id="lcStart" type="number" step="any"></label><label>End (min)<input id="lcEnd" type="number" step="any"></label><button id="lcApply">Apply window</button><button id="lcAll">Full run</button></div></section>
 <section class="card lcChart"><div class="sectionhead"><h2>Mass spectrum</h2><small>Drag to zoom · Double-click to reset</small></div><div id="lcSummary"></div><canvas id="lcMass" aria-label="Intensity versus mass-to-charge ratio"></canvas><output id="lcMassRead"></output>
-<div class="lcInline"><label>Minimum m/z<input id="lcLow" type="number" step="any" placeholder="Auto"></label><label>Maximum m/z<input id="lcHigh" type="number" step="any" placeholder="Auto"></label><button id="lcZoom">Set range</button><button id="lcReset">Reset zoom</button><label>Window bin width (Da)<input type="number" id="lcBin" step="any" value="0.01"></label></div><p class="lcHint">Single scans show native m/z values. Across a window, intensities are summed in fixed-width bins and divided by the number of scans. Each bin is plotted at its intensity-weighted m/z.</p><details id="lcPeaks"><summary>Strongest peaks in view</summary><div id="lcPeakRows"></div></details></section></div></main>
+<div class="lcInline"><label>Minimum m/z<input id="lcLow" type="number" step="any" placeholder="Auto"></label><label>Maximum m/z<input id="lcHigh" type="number" step="any" placeholder="Auto"></label><button id="lcZoom">Set range</button><button id="lcReset">Reset zoom</button><label>Window bin width (Da)<input type="number" id="lcBin" step="any" value="0.01"></label></div><p class="lcHint">Single scans show native m/z values. Across a window, intensities are summed in fixed-width bins and divided by the number of scans. Each bin is plotted at its intensity-weighted m/z.</p><details id="lcPeaks"><summary>Strongest peaks in view</summary><div class="lcFilters findControls"><label>Peaks per run<select id="lcPeakCount"><option>10</option><option>25</option><option>50</option><option>100</option><option>500</option><option value="all">All peaks</option></select></label><label>Exclude peaks in blank<select id="lcPeakBlank"></select></label>
+<label>Blank comparison<select id="lcPeakScope"><option value="window">Same elution window</option><option value="any">Any scan in blank</option></select></label>
+<label>Blank tolerance (±)<input type="number" step="any" id="lcPeakTol" value="10"></label><label>Unit<select id="lcPeakUnit"><option>ppm</option><option>Da</option></select></label></div>
+<div id="lcPeakRows"></div></details><details id="lcFormula" class="formulaPanel"><summary>Formula candidates</summary>
+<div class="lcFilters findControls">
+<label>Observed m/z<input type="number" step="any" id="lcFormulaMz" placeholder="Select a peak or enter m/z"></label>
+<label>Signed m/z offset<input type="number" step="any" value="0" id="lcFormulaOffset"></label>
+<label>Mass tolerance (±)<input type="number" step="any" value="5" id="lcFormulaTol"></label>
+<label>Unit<select id="lcFormulaUnit"><option>ppm</option><option>Da</option></select></label></div>
+<p id="lcFormulaTarget" class="lcHint"></p>
+<fieldset><legend>Ion interpretation</legend><div class="formulaChoices" id="lcFormulaAds"></div></fieldset>
+<fieldset><legend>Elements in the neutral formula</legend><div id="lcAtoms" class="formulaAtoms"></div></fieldset>
+<button id="lcFormulaGo" class="primary">Find formulas</button> <button id="lcFormulaStop" hidden>Cancel</button>
+<p role="status" id="lcFormulaStatus"></p><div id="lcFormulaResults" hidden>
+<div class="lcInline"><label>Order by<select id="lcFormulaSort"><option value="error">Absolute mass error</option></select></label><label>Direction<select id="lcFormulaDir"><option value="1">Lowest first</option><option value="-1">Highest first</option></select></label></div><div class="findTable" id="lcFormulaRows"></div>
+<div id="lcFormulaPages"><button id="lcFormulaPrev">Previous</button> <span id="lcFormulaPage"></span> <button id="lcFormulaNext">Next</button></div></div></details>
+</section></div></main>
 <dialog id="viewer" aria-label="Full photo view"><div class="viewer-head"><span id="viewerIndex"></span><button id="closeViewer" aria-label="Close photo">×</button></div><img id="viewerImage" alt=""><div class="viewer-foot"><button id="previous" aria-label="Previous photo">←</button><div class="viewer-copy"><div id="viewerCaption"></div><div id="viewerDate"></div></div><button id="next" aria-label="Next photo">→</button></div></dialog>
 <script>
 'use strict';
@@ -756,7 +772,46 @@ async function openSession(id){
 
 activate();
 })();
-</script><script type="text/plain" id="lcWorker">/*
+</script><script type="text/plain" id="lcFormulaWorker">// The search interval is defined on theoretical ion m/z, including the selected adduct.
+function enumerateFormula({observed,offset,tolerance,unit,atoms,adducts}){
+  const target=observed+offset;
+  const fractional=tolerance/1e6;
+  const ionLow=unit==='ppm'?target/(1+fractional):target-tolerance;
+  const ionHigh=unit==='ppm'?target/(1-fractional):target+tolerance;
+  const order=atoms.map((a,i)=>({...a,i})).filter(a=>a.max>0)
+    .sort((a,b)=>(a.max-a.min)-(b.max-b.min));
+  if(!order.length)return [];
+  const counts=atoms.map(()=>0),rows=[];
+  const lowTail=[0],highTail=[0];
+  for(let i=order.length-1;i>=0;i--){
+    lowTail.unshift(lowTail[0]+order[i].mass*order[i].min);
+    highTail.unshift(highTail[0]+order[i].mass*order[i].max);
+  }
+  for(const adduct of adducts){
+    const low=ionLow-adduct.shift,high=ionHigh-adduct.shift;
+    function visit(i,mass){
+      if(i===order.length){
+        const ion=mass+adduct.shift,error=target-ion;
+        if(mass<=0||ion<=0||Math.abs(error)>(unit==='ppm'?ion*fractional:tolerance)+1e-12)return;
+        if(rows.length===100000)throw Error('More than 100,000 candidates. Narrow the element bounds or mass tolerance and search again.');
+        rows.push({counts:counts.slice(),mass,ion,adduct:adduct.name,error,ppm:error/ion*1e6});
+        return;
+      }
+      const a=order[i];
+      const min=Math.max(a.min,Math.ceil((low-mass-highTail[i+1]-1e-10)/a.mass));
+      const max=Math.min(a.max,Math.floor((high-mass-lowTail[i+1]+1e-10)/a.mass));
+      for(let n=min;n<=max;n++){counts[a.i]=n;visit(i+1,mass+n*a.mass);}
+    }
+    visit(0,0);
+  }
+  return rows;
+}
+onmessage=({data})=>{
+  try{postMessage({rows:enumerateFormula(data)});}
+  catch(e){postMessage({error:e.message});}
+};
+</script>
+<script type="text/plain" id="lcWorker">/*
 # Blue Oak Model License
 
 Version 1.0.0
@@ -2615,6 +2670,22 @@ function compute(r,c){
   return {trace:trace||{x:[],y:[]},mass,n:chosen.length,first:chosen[0]?.t,last:chosen.at(-1)?.t};
 }
 // Search native, unbinned MS1 peaks. Each adduct below has charge magnitude one.
+function peakBlank(run,c){
+  const scans=run?.channels.get(c.channel);
+  if(!scans?.length)throw Error('Blank has no scans in the displayed mass channel.');
+  let spectra=scans;
+  if(c.scope==='window'){
+    const {mass,n}=compute(run,c);
+    if(!n)throw Error('No blank scans in this elution window. Change the window or choose Any scan in blank.');
+    spectra=[mass];
+  }
+  const unique=new Set();
+  for(const s of spectra)for(let i=0;i<s.x.length;i++){
+    if(s.y[i]>0&&(!s.profile||((i===0||s.y[i]>=s.y[i-1])&&(i===s.y.length-1||s.y[i]>s.y[i+1]))))unique.add(s.x[i]);
+  }
+  return Float64Array.from(unique).sort();
+}
+
 function lowerMass(values,mass){
   let a=0,b=values.length;
   while(a<b){const mid=(a+b)>>>1;if(values[mid]<mass)a=mid+1;else b=mid;}
@@ -2705,6 +2776,7 @@ onmessage=async({data:{id,type,key,file,c}})=>{
   try{let result;
     if(type==='read'){const r=await read(file);runs.set(key,r);result={meta:r.meta,native:[...r.native.keys()],count:r.count};}
     else if(type==='remove')runs.delete(key);
+    else if(type==='peakBlank')result=peakBlank(runs.get(key),c);
     else if(type==='find')result=findComponents(c);
     else result=compute(runs.get(key),c);
     postMessage({id,result});
@@ -2733,7 +2805,7 @@ function controls(){
   const all=[...files.values()];get('Controls').hidden=!all.length;get('Empty').hidden=!!all.length;
   options('Channel',[...new Set(all.flatMap(d=>Object.keys(d.meta)))].sort().map(k=>[k,k]));
   options('Kind',[['TIC','Total ion current'],['BPC','Base peak'],['XIC','Extracted ion (XIC)'],...[...new Set(all.flatMap(d=>d.native))].map(k=>['native:'+k,'Recorded · '+k])]);
-  get('Ion').hidden=get('Kind').value!=='XIC';get('Runs').replaceChildren();finderFields(true);
+  get('Ion').hidden=get('Kind').value!=='XIC';get('Runs').replaceChildren();finderFields(true);options('PeakBlank',[['','None'],...all.map(d=>[String(d.key),d.name])]);blankCache=null;
   all.forEach(d=>{
     const row=element('div','lcRun'),check=document.createElement('input');check.type='checkbox';check.checked=d.visible;check.setAttribute('aria-label','Show '+d.name);check.onchange=()=>{d.visible=check.checked;finderFields();update();};
     const sw=element('span','lcSw');sw.style.background=d.color;
@@ -2766,7 +2838,7 @@ async function update(){
     if(c.kind==='XIC'){c.target=numeric('Target');c.tol=numeric('Tol');if(c.target<=0||c.tol<=0)throw Error('Enter a positive target m/z and ppm tolerance.');}
     get('Status').textContent='Updating plots…';
     const next=await Promise.all([...files.values()].filter(f=>f.visible).map(async f=>({...f,...await call('plot',{key:f.key,c})})));
-    if(version!==token)return;results=next;get('Status').textContent=next.length?'':'Select a run to display.';
+    if(version!==token)return;results=next;displayedConfig=c;get('Status').textContent=next.length?'':'Select a run to display.';
     get('Summary').textContent=next.map(r=>r.name+' · '+(r.n===0?'no matching scans':r.n===1?'scan at '+r.first.toFixed(4)+' min':r.n+' scans, '+r.first.toFixed(4)+'–'+r.last.toFixed(4)+' min')).join('   |   ');drawAll();
   }catch(e){if(token===version){fail(e);get('Status').textContent='';}}
 }
@@ -2856,28 +2928,65 @@ for(const id of ['Trace','Mass']){
   };
   cv.onpointercancel=()=>{drag=null;drawAll();};cv.onpointerleave=()=>{get(id+'Read').textContent='';};
 }
-function peakTable(){
-  const box=get('PeakRows');box.replaceChildren();
-  for(const run of results){
-    const {x,y,profile}=run.mass,top=[];
-    for(let i=0;i<x.length;i++){
-      if((zoom[0]!==null&&x[i]<zoom[0])||(zoom[1]!==null&&x[i]>zoom[1])||y[i]<=0)continue;
-      if(profile&&(y[i]<y[i-1]||y[i]<y[i+1]))continue;
-      if(top.length===10&&y[i]<=y[top[9]])continue;
-      top.push(i);top.sort((a,b)=>y[b]-y[a]);if(top.length>10)top.pop();
-    }
-    box.append(element('h3','',run.name));
-    if(!top.length){box.append(element('small','','No peaks in range.'));continue;}
-    const table=document.createElement('table'),header=table.createTHead().insertRow();
-    for(const name of ['m/z','Intensity','Chromatogram'])header.append(element('th','',name));
-    const body=table.createTBody();
-    for(const i of top){
-      const row=body.insertRow();row.insertCell().textContent=x[i].toFixed(5);row.insertCell().textContent=fmt(y[i]);
-      const b=element('button','small','Extract ion');b.onclick=()=>{get('Target').value=x[i].toFixed(7);get('Kind').value='XIC';update();};row.insertCell().append(b);
-    }
-    box.append(table);
+let peakRevision=0,blankCache=null,displayedConfig=null;
+function observedPeaks(mass){
+  const {x,y,profile}=mass,ids=[];
+  for(let i=0;i<x.length;i++){
+    if(y[i]<=0||!Number.isFinite(x[i]))continue;
+    if(profile&&(y[i]<y[i-1]||y[i]<=y[i+1]))continue;
+    ids.push(i);
   }
+  return ids;
 }
+async function peakTable(){
+  const seq=++peakRevision,box=get('PeakRows'),blankKey=Number(get('PeakBlank').value);
+  box.replaceChildren();
+  try{
+    let blankMasses=null,tol=0;
+    if(blankKey){
+      tol=numeric('PeakTol');if(tol<=0)throw Error('Enter a positive blank tolerance.');
+      if(!displayedConfig)return;
+      const c={...displayedConfig,scope:get('PeakScope').value};
+      const cacheId=JSON.stringify([blankKey,c.channel,c.scope,...(c.scope==='window'?[c.start,c.end,c.bin]:[])]);
+      if(blankCache?.id!==cacheId)blankCache={id:cacheId,promise:call('peakBlank',{key:blankKey,c})};
+      blankMasses=await blankCache.promise;if(seq!==peakRevision)return;
+    }else blankCache=null;
+    const samples=results.filter(r=>r.key!==blankKey);
+    if(!samples.length)box.textContent='Select a visible sample run.';
+    for(const run of samples){
+      const {x,y}=run.mass;
+      const ranks=observedPeaks(run.mass).filter(i=>{
+        const mz=x[i];if(zoom[0]!==null&&mz<zoom[0]||zoom[1]!==null&&mz>zoom[1])return false;
+        if(!blankMasses)return true;
+        const d=get('PeakUnit').value==='ppm'?mz*tol/1e6:tol;
+        const k=lowerBlank(blankMasses,mz-d);
+        return k===blankMasses.length||blankMasses[k]>mz+d;
+      }).sort((i,j)=>y[j]-y[i]);
+      const count=Math.min(ranks.length,get('PeakCount').value==='all'?Infinity:Number(get('PeakCount').value));
+      box.append(element('h3','',run.name+' · '+count+' of '+ranks.length+' peaks'));
+      if(!count)continue;
+      const table=document.createElement('table'),header=table.createTHead().insertRow(),body=table.createTBody();
+      for(const name of ['Rank','m/z','Intensity','Actions'])header.append(element('th','',name));
+      const nav=element('div',''),back=element('button','small','Previous'),next=element('button','small','Next'),num=element('span','');
+      let page=0;
+      function display(){
+        body.replaceChildren();
+        for(let j=page*50;j<Math.min(count,(page+1)*50);j++){
+          const i=ranks[j],row=body.insertRow();row.insertCell().textContent=j+1;row.insertCell().textContent=x[i].toFixed(5);row.insertCell().textContent=fmt(y[i]);
+          const b=element('button','small','Extract ion');b.onclick=()=>{get('Target').value=x[i].toFixed(7);get('Kind').value='XIC';update();};
+          row.insertCell().append(b,' ',formulaButton(x[i],null,displayedConfig?.channel));
+        }
+        num.textContent=' '+(page+1)+' / '+Math.ceil(count/50)+' ';back.disabled=page===0;next.disabled=(page+1)*50>=count;
+      }
+      back.onclick=()=>{page--;display();};next.onclick=()=>{page++;display();};nav.append(back,num,next);box.append(table);if(count>50)box.append(nav);display();
+    }
+  }catch(e){if(seq===peakRevision)box.textContent=e.message;}
+}
+function lowerBlank(values,target){
+  let lo=0,hi=values.length;
+  while(lo<hi){const mid=(lo+hi)>>>1;if(values[mid]<target)lo=mid+1;else hi=mid;}return lo;
+}
+for(const key of ['PeakCount','PeakBlank','PeakScope','PeakTol','PeakUnit'])get(key).onchange=peakTable;
 get('Peaks').ontoggle=()=>{if(get('Peaks').open)peakTable();};
 const adductList=[
   ['[M+H]+',1.00727647,1],['[M+Na]+',22.9892207,1],['[M+Li]+',7.0154549,1],['[M+NH4]+',18.0338256,1],['[M+K]+',38.9631579,1],
@@ -2916,7 +3025,7 @@ function renderFind(){
     const m=n=>n.toFixed(5),t=r.t.toFixed(4),i=fmt(r.apex);
     const cells=c.mode==='target'?[r.ad,m(r.theory),m(r.mz),r.ppm.toFixed(2),r.sn,t,i]:c.mode==='pairs'?[r.ad+' / '+r.other,m(r.mz)+' / '+m(r.mz2),m(r.neutral),r.ppm.toFixed(2),r.n,t,i]:[m(r.mz),r.n,t,i];
     const row=body.insertRow();for(const v of [files.get(r.key)?.name,...cells,...(c.blank?[r.bg?'Present':'Undetected']:[])])row.insertCell().textContent=v;
-    const open=element('button','small','View scan');open.onclick=()=>{get('Channel').value=c.channel;get('Start').value=get('End').value=r.t;get('Low').value=get('High').value='';zoom=[null,null];get('Kind').value='TIC';update();get('Mass').scrollIntoView({block:'center'});};row.insertCell().append(open);
+    const open=element('button','small','View scan');open.onclick=()=>{get('Channel').value=c.channel;get('Start').value=get('End').value=r.t;get('Low').value=get('High').value='';zoom=[null,null];get('Kind').value='TIC';update();get('Mass').scrollIntoView({block:'center'});};row.insertCell().append(open,' ',formulaButton(r.mz,r.ad,c.channel));
   }
   box.append(table);const pages=Math.ceil(findRows.length/40);get('FindPages').hidden=pages<=1;get('FindPage').textContent=(findPage+1)+' / '+pages;get('FindPrev').disabled=findPage===0;get('FindNext').disabled=findPage+1===pages;
 }
@@ -2939,6 +3048,91 @@ get('Find').onclick=async()=>{
   }catch(e){if(token===findGeneration)get('FindStatus').textContent=e.message;}
   finally{if(token===findGeneration)get('Find').disabled=false;}
 };
+
+const formulaAtoms=[
+  ['C',12,40],['H',1.00782503223,80],['O',15.99491461957,16],['N',14.00307400443,8],
+  ['P',30.97376199842,3],['F',18.99840316273,16],['Li',7.0160034366,2],['S',31.9720711744,4]
+];
+const formulaAds=[['Neutral mass',0,0],...adductList];
+let formulaWorker=null,formulaRows=[],formulaPage=0;
+for(const [symbol,,max] of formulaAtoms){
+  const group=element('div','atomGroup'),label=element('label','atomName');
+  const include=document.createElement('input');include.type='checkbox';include.checked=['C','H','O'].includes(symbol);
+  label.append(include,symbol);group.append(label);
+  for(const [key,start] of [['Min',0],['Max',max]]){
+    const l=element('label','',key),n=document.createElement('input');
+    n.type='number';n.min=0;n.step=1;n.value=start;n.setAttribute('aria-label',symbol+' '+key);n.disabled=!include.checked;
+    l.append(n);group.append(l);
+  }
+  include.onchange=()=>group.querySelectorAll('input[type=number]').forEach(n=>n.disabled=!include.checked);
+  get('Atoms').append(group);get('FormulaSort').add(new Option(symbol+' count',symbol));
+}
+for(const [name] of formulaAds){
+  const l=document.createElement('label'),b=document.createElement('input');b.type='checkbox';b.value=name;b.checked=name==='[M+H]+';l.append(b,name);get('FormulaAds').append(l);
+}
+function formulaReset(){
+  formulaWorker?.terminate();formulaWorker=null;formulaRows=[];get('FormulaStop').hidden=true;get('FormulaGo').disabled=false;
+  get('FormulaResults').hidden=true;get('FormulaStatus').textContent='';
+  const mz=get('FormulaMz').valueAsNumber,off=get('FormulaOffset').valueAsNumber;
+  get('FormulaTarget').textContent=Number.isFinite(mz+off)?'Adjusted target = '+mz+' + ('+off+') = '+(mz+off).toFixed(7)+'. Each selected adduct is removed before matching the neutral formula.':'Adjusted target = observed m/z + signed offset. Enter a negative offset to subtract mass.';
+}
+function formulaButton(mz,ad,channel){
+  const b=element('button','small','Formulas');
+  b.onclick=()=>{
+    get('FormulaMz').value=String(mz);
+    if(ad||channel){const chosen=ad||(channel.includes('−')?'[M−H]−':'[M+H]+');for(const cb of get('FormulaAds').querySelectorAll('input'))cb.checked=cb.value===chosen;}
+    formulaReset();get('Formula').open=true;get('Formula').scrollIntoView({block:'start'});get('FormulaMz').focus({preventScroll:true});
+  };return b;
+}
+get('Formula').addEventListener('input',e=>{if(!get('FormulaResults').contains(e.target))formulaReset();});
+get('FormulaStop').onclick=()=>{formulaReset();get('FormulaStatus').textContent='Search cancelled.';};
+function renderFormulas(){
+  const body=get('FormulaRows');body.replaceChildren();
+  const table=document.createElement('table'),header=table.createTHead().insertRow(),tbody=table.createTBody();
+  for(const name of ['Neutral formula','Adduct','Neutral mass (Da)','Calculated m/z','Δ Da','Δ ppm',...formulaAtoms.map(a=>a[0])])header.append(element('th','',name));
+  const hill=['C','H','F','Li','N','O','P','S'];
+  for(const r of formulaRows.slice(formulaPage*50,(formulaPage+1)*50)){
+    const order=r.counts[0]?hill:[...hill].sort();
+    const formula=order.map(s=>{const n=r.counts[formulaAtoms.findIndex(a=>a[0]===s)];return n?s+(n===1?'':n):'';}).join('');
+    const row=tbody.insertRow();for(const v of [formula,r.adduct,r.mass.toFixed(7),r.ion.toFixed(7),r.error.toFixed(7),r.ppm.toFixed(3),...r.counts])row.insertCell().textContent=v;
+  }
+  body.append(table);const pages=Math.ceil(formulaRows.length/50);
+  get('FormulaPages').hidden=pages<=1;get('FormulaPage').textContent=' '+(formulaPage+1)+' / '+pages+' ';get('FormulaPrev').disabled=!formulaPage;get('FormulaNext').disabled=formulaPage+1>=pages;
+}
+function sortFormulas(){
+  const idx=formulaAtoms.findIndex(a=>a[0]===get('FormulaSort').value),dir=Number(get('FormulaDir').value);
+  formulaRows.sort((a,b)=>dir*(idx<0?Math.abs(a.error)-Math.abs(b.error):a.counts[idx]-b.counts[idx])||Math.abs(a.error)-Math.abs(b.error));
+  formulaPage=0;renderFormulas();
+}
+get('FormulaPrev').onclick=()=>{formulaPage--;renderFormulas();};get('FormulaNext').onclick=()=>{formulaPage++;renderFormulas();};
+get('FormulaSort').onchange=get('FormulaDir').onchange=sortFormulas;
+get('FormulaGo').onclick=()=>{
+  formulaReset();
+  try{
+    const observed=numeric('FormulaMz'),offset=numeric('FormulaOffset'),tolerance=numeric('FormulaTol'),unit=get('FormulaUnit').value;
+    if(observed<=0||observed+offset<=0||!Number.isFinite(observed+offset)||tolerance<=0||unit==='ppm'&&tolerance>=1e6)throw Error('Use positive masses and tolerance. A ppm tolerance must be below 1,000,000.');
+    const selected=new Set([...get('FormulaAds').querySelectorAll('input:checked')].map(b=>b.value));
+    if(!selected.size)throw Error('Select at least one ion interpretation.');
+    const adducts=formulaAds.filter(a=>selected.has(a[0])).map(([name,shift])=>({name,shift}));
+    const atoms=formulaAtoms.map(([symbol,mass],i)=>{
+      const [enabled,lo,hi]=get('Atoms').children[i].querySelectorAll('input');
+      const min=enabled.checked?lo.valueAsNumber:0,max=enabled.checked?hi.valueAsNumber:0;
+      if(!Number.isSafeInteger(min)||!Number.isSafeInteger(max)||min<0||max<min)throw Error('Check the integer bounds for '+symbol+'.');
+      return {mass,min,max};
+    });
+    if(!atoms.some(a=>a.max))throw Error('Allow at least one atom.');
+    const u=URL.createObjectURL(new Blob([get('FormulaWorker').textContent],{type:'text/javascript'}));
+    formulaWorker=new Worker(u);URL.revokeObjectURL(u);get('FormulaGo').disabled=true;get('FormulaStop').hidden=false;get('FormulaStatus').textContent='Searching element combinations…';
+    function finish(){formulaWorker?.terminate();formulaWorker=null;get('FormulaGo').disabled=false;get('FormulaStop').hidden=true;}
+    formulaWorker.onerror=e=>{finish();get('FormulaStatus').textContent=e.message||'Formula search failed.';};
+    formulaWorker.onmessage=({data})=>{
+      finish();if(data.error){get('FormulaStatus').textContent=data.error;return;}
+      formulaRows=data.rows;get('FormulaStatus').textContent=formulaRows.length.toLocaleString()+' mass-matched formula/adduct combinations.';
+      if(formulaRows.length){get('FormulaResults').hidden=false;sortFormulas();}
+    };
+    formulaWorker.postMessage({observed,offset,tolerance,unit,atoms,adducts});
+  }catch(e){get('FormulaStatus').textContent=e.message;}
+};formulaReset();
 
 get('Mass').ondblclick=resetZoom;
 window.addEventListener('resize',drawAll);window.addEventListener('hashchange',()=>requestAnimationFrame(drawAll));
